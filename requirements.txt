@@ -2,3 +2,4 @@ pandas==1.5.3
 plotly==5.18.0
 st-gsheets-connection==0.0.3
 pyyaml==6.0.1
+streamlit-authenticator==0.2.3
