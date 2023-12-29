@@ -1,2 +1,5 @@
 .streamlit/secrets.toml
 custom-seeker-409614-3496285fbaee.json
+generate_keys.py
+*.pkl
+*.yaml
