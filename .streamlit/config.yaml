@@ -1,0 +1,10 @@
+credentials:
+  usernames:
+    ledsouza:
+      email: leandro.souza.159@gmail.com
+      name: Leandro Souza
+      password: $2b$12$QI5rLIy.KefhUvSz7KVWuOOMCQEnQG8FK6XYY3s4ihw34Ur0/wCx6
+cookie:
+  expiry_days: 1
+  key: random_signature_key
+  name: random_cookie_name
