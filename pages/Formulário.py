@@ -44,7 +44,7 @@ if authentication_status:
             submit_button = st.form_submit_button(label="Inserir dados")
 
             if submit_button:
-                data = conn.read(usecols=range(6), ttl="60m")
+                data = conn.read(usecols=range(6), ttl="0")
                 data.dropna(inplace=True)
                 data['Data'] = pd.to_datetime(data['Data'], format='%m/%d/%Y')
                 if not data.query('Data == @date').empty:
@@ -81,7 +81,7 @@ if authentication_status:
             submit_button = st.form_submit_button(label="Atualizar dados")
 
             if submit_button:
-                data = conn.read(usecols=range(6), ttl="60m")
+                data = conn.read(usecols=range(6), ttl="0")
                 data.dropna(inplace=True)
                 data['Data'] = pd.to_datetime(data['Data'], format='%m/%d/%Y')
                 if data.query('Data == @date').empty:
@@ -114,7 +114,7 @@ if authentication_status:
             submit_button = st.form_submit_button(label="Deletar dados")
 
             if submit_button:
-                data = conn.read(usecols=range(6), ttl="60m")
+                data = conn.read(usecols=range(6), ttl="0")
                 data.dropna(inplace=True)
                 data['Data'] = pd.to_datetime(data['Data'], format='%m/%d/%Y')
                 if data.query('Data == @date').empty:
