@@ -31,12 +31,14 @@ if authentication_status:
     # Create a connection object.
     conn = st.connection("gsheets", type=GSheetsConnection)
 
-    data = conn.read(usecols=range(6), ttl="60m")
+    data = conn.read(usecols=range(6), ttl="1m")
+    data.dropna(inplace=True)
     data['Data'] = pd.to_datetime(data['Data'], format='%m/%d/%Y')
     data[['Clientes', 'Produtos', 'Ticket Médio', 'Faturamento']] = data[['Clientes', 'Produtos', 'Ticket Médio', 'Faturamento']] * 100 # Changing to percentage
 
-    updated_data = st.data_editor(
-        data,
+    st.markdown('# Banco de dados')
+    st.dataframe(
+        data.sort_values(by='Data', ascending=False),
         column_config={
             'Data': st.column_config.DatetimeColumn(
                 'Data',
@@ -60,7 +62,3 @@ if authentication_status:
             )
         }
     )
-
-    if not data.equals(updated_data):
-        updated_data[['Clientes', 'Produtos', 'Ticket Médio', 'Faturamento']] = updated_data[['Clientes', 'Produtos', 'Ticket Médio', 'Faturamento']] / 100
-        conn.update(data=updated_data)
