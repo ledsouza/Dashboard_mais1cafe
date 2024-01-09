@@ -31,9 +31,9 @@ if authentication_status:
     # Create a connection object.
     conn = st.connection("gsheets", type=GSheetsConnection)
 
-    data = conn.read(usecols=range(6), ttl="1m")
+    data = conn.read(usecols=range(6), ttl="60m")
     data['Data'] = pd.to_datetime(data['Data'], format='%m/%d/%Y')
-    data[['Clientes', 'PA', 'Ticket Médio', 'Faturamento']] = data[['Clientes', 'PA', 'Ticket Médio', 'Faturamento']] * 100
+    data[['Clientes', 'Produtos', 'Ticket Médio', 'Faturamento']] = data[['Clientes', 'Produtos', 'Ticket Médio', 'Faturamento']] * 100 # Changing to percentage
 
     updated_data = st.data_editor(
         data,
@@ -46,8 +46,8 @@ if authentication_status:
                 'Clientes',
                 format='%d%%'
             ),
-            'PA': st.column_config.NumberColumn(
-                'PA',
+            'Produtos': st.column_config.NumberColumn(
+                'Produtos',
                 format='%d%%'
             ),
             'Ticket Médio': st.column_config.NumberColumn(
@@ -62,5 +62,5 @@ if authentication_status:
     )
 
     if not data.equals(updated_data):
-        updated_data[['Clientes', 'PA', 'Ticket Médio', 'Faturamento']] = updated_data[['Clientes', 'PA', 'Ticket Médio', 'Faturamento']] / 100
+        updated_data[['Clientes', 'Produtos', 'Ticket Médio', 'Faturamento']] = updated_data[['Clientes', 'Produtos', 'Ticket Médio', 'Faturamento']] / 100
         conn.update(data=updated_data)
