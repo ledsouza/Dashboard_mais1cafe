@@ -35,11 +35,11 @@ if authentication_status:
         with st.form(key="insert_data", clear_on_submit=True):
             date = st.date_input(label='Data')
             date = pd.to_datetime(date)
-            clientes = st.number_input(label='Clientes')
-            produtos = st.number_input(label='Produtos')
-            pa = st.number_input(label='PA')
-            ticket_medio = st.number_input(label='Ticket Médio')
-            faturamento = st.number_input(label='Faturamento')
+            clientes = st.number_input(label='Clientes', max_value=2)
+            produtos = st.number_input(label='Produtos', max_value=2)
+            pa = st.number_input(label='PA', max_value=4)
+            ticket_medio = st.number_input(label='Ticket Médio', max_value=2)
+            faturamento = st.number_input(label='Faturamento', max_value=2)
 
             submit_button = st.form_submit_button(label="Inserir dados")
 
@@ -125,4 +125,39 @@ if authentication_status:
 
                     st.success("YESSSSS")
     
-    
+    data = conn.read(usecols=range(6), ttl="0")
+    data.dropna(inplace=True)
+    data["Data"] = pd.to_datetime(data["Data"], format="%m/%d/%Y")
+    data.sort_values(by="Data", ascending=False, inplace=True)
+    data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
+        data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
+    )  # Alterando para porcentagem
+
+    # Tabela de dados completa
+    dias_da_semana = {
+        "Monday": "Segunda-feira",
+        "Tuesday": "Terça-feira",
+        "Wednesday": "Quarta-feira",
+        "Thursday": "Quinta-feira",
+        "Friday": "Sexta-feira",
+        "Saturday": "Sábado",
+        "Sunday": "Domingo",
+    }
+    data["Dia da Semana"] = data["Data"].dt.day_name().map(dias_da_semana)
+
+    st.markdown("# Banco de dados")
+    st.dataframe(
+        data,
+        hide_index=True,
+        column_config={
+            "Data": st.column_config.DatetimeColumn("Data", format="DD.MM.YYYY"),
+            "Clientes": st.column_config.NumberColumn("Clientes", format="%d%%"),
+            "Produtos": st.column_config.NumberColumn("Produtos", format="%d%%"),
+            "Ticket Médio": st.column_config.NumberColumn(
+                "Ticket Médio", format="%d%%"
+            ),
+            "Faturamento": st.column_config.NumberColumn(
+                "Faturamento", format="%d%%"
+            ),
+        },
+    )

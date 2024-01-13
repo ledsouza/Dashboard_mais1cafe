@@ -68,7 +68,11 @@ if authentication_status:
         labels={"variable": "Metas"},
     )
     fig_evolucao_metas.update_layout(
-        title="Evolução das metas", xaxis_title="", yaxis_title="Metas (%)"
+        title="Evolução das metas", xaxis_title="", yaxis_title="Metas (%)",
+        xaxis=dict(
+            range=[filtered_data['Data'].min(), filtered_data['Data'].max()],
+            tickmode='auto'
+        )
     )
     fig_evolucao_metas.update_traces(
         mode="markers+lines",
@@ -87,40 +91,7 @@ if authentication_status:
 
     st.plotly_chart(fig_evolucao_metas, use_container_width=True)
 
-    # Tabela de dados completa
-    dias_da_semana = {
-        "Monday": "Segunda-feira",
-        "Tuesday": "Terça-feira",
-        "Wednesday": "Quarta-feira",
-        "Thursday": "Quinta-feira",
-        "Friday": "Sexta-feira",
-        "Saturday": "Sábado",
-        "Sunday": "Domingo",
-    }
-    data["Dia da Semana"] = data["Data"].dt.day_name().map(dias_da_semana)
-
-    st.markdown("# Banco de dados")
-
-    col1, col2 = st.columns(2, gap="small")
-    with col1:
-        st.dataframe(
-            data,
-            hide_index=True,
-            column_config={
-                "Data": st.column_config.DatetimeColumn("Data", format="DD.MM.YYYY"),
-                "Clientes": st.column_config.NumberColumn("Clientes", format="%d%%"),
-                "Produtos": st.column_config.NumberColumn("Produtos", format="%d%%"),
-                "Ticket Médio": st.column_config.NumberColumn(
-                    "Ticket Médio", format="%d%%"
-                ),
-                "Faturamento": st.column_config.NumberColumn(
-                    "Faturamento", format="%d%%"
-                ),
-            },
-        )
-
-    with col2:
-        st.dataframe(
+    st.dataframe(
             data.describe().rename(
                 index={
                     "count": "Contagem Total",
