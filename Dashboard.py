@@ -6,6 +6,7 @@ from streamlit_gsheets import GSheetsConnection
 import streamlit_authenticator as stauth
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="Dashboard de Metas", layout="wide")
 
@@ -107,7 +108,35 @@ if authentication_status:
         line=dict(color="red", width=1, dash="dot"),
     )
 
+    # Visualização dos dados
     st.plotly_chart(fig_evolucao_metas, use_container_width=True)
+
+    # Distribuição das metas
+    metas = filtered_data.columns[1:6]
+    meta = st.selectbox(label="Selecione a meta", options=metas, index=0)
+    title_text = f"Distribuição da Meta de {meta}"
+    fig_dist = go.Figure(
+        data=[
+            go.Histogram(
+                x=filtered_data[meta],
+                showlegend=False,
+                name="",
+                hovertemplate="Faixa de valores: %{x}%<br>Frequência: %{y}",
+                textposition="outside",
+                texttemplate="%{y}"
+            )
+        ]
+    )
+    fig_dist.update_layout(
+        title=title_text,
+        xaxis_title="Metas (%)",
+        yaxis_title="Contagem",
+        yaxis=dict(
+                showticklabels=False
+        )
+    )
+    fig_dist.update_traces(marker_line_width=1, marker_line_color="white")
+    st.plotly_chart(fig_dist, use_container_width=True)
 
     st.dataframe(statistics, use_container_width=True)
 
