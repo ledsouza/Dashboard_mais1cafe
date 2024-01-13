@@ -1,3 +1,4 @@
 .streamlit/secrets.toml
 *.json
 generate_keys.py
+/venv
