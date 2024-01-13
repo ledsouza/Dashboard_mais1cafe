@@ -57,8 +57,24 @@ if authentication_status:
     query = """
     @periodo[0] <= Data <= @periodo[1]
     """
-
+    # Tabelas
     filtered_data = data.query(query)
+    statistics = filtered_data.describe().rename(
+        index={
+            "count": "Contagem Total",
+            "mean": "Média",
+            "std": "Desvio Padrão",
+            "min": "Mínimo",
+            "max": "Máximo",
+        }
+    )
+    statistics = (
+        statistics.iloc[1:, :]
+        .style.format(
+            "{:.0f}%", subset=["Clientes", "Produtos", "Ticket Médio", "Faturamento"]
+        )
+        .format("{:.1f}", subset=["PA"], decimal=",")
+    )
 
     # Plots
     fig_evolucao_metas = px.line(
@@ -68,11 +84,13 @@ if authentication_status:
         labels={"variable": "Metas"},
     )
     fig_evolucao_metas.update_layout(
-        title="Evolução das metas", xaxis_title="", yaxis_title="Metas (%)",
+        title="Evolução das metas",
+        xaxis_title="",
+        yaxis_title="Metas (%)",
         xaxis=dict(
-            range=[filtered_data['Data'].min(), filtered_data['Data'].max()],
-            tickmode='auto'
-        )
+            range=[filtered_data["Data"].min(), filtered_data["Data"].max()],
+            tickmode="auto",
+        ),
     )
     fig_evolucao_metas.update_traces(
         mode="markers+lines",
@@ -91,16 +109,6 @@ if authentication_status:
 
     st.plotly_chart(fig_evolucao_metas, use_container_width=True)
 
-    st.dataframe(
-            data.describe().rename(
-                index={
-                    "count": "Contagem Total",
-                    "mean": "Média",
-                    "std": "Desvio Padrão",
-                    "min": "Mínimo",
-                    "max": "Máximo",
-                }
-            )
-        )
+    st.dataframe(statistics, use_container_width=True)
 
     authenticator.logout("Logout", "sidebar")

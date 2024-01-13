@@ -5,6 +5,8 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 
+st.set_page_config(layout="wide")
+
 # --- USER AUTHENTICATION ---
 with open(".streamlit/config.yaml") as file:
     config = yaml.load(file, Loader=SafeLoader)
@@ -144,20 +146,11 @@ if authentication_status:
         "Sunday": "Domingo",
     }
     data["Dia da Semana"] = data["Data"].dt.day_name().map(dias_da_semana)
+    data = (data.style
+            .format("{:.0f}%", subset=["Clientes", "Produtos", "Ticket Médio", "Faturamento"])
+            .format("{:.1f}", subset=["PA"], decimal=",")
+            .format("{:%d.%m.%Y}", subset=["Data"])
+            )
 
     st.markdown("# Banco de dados")
-    st.dataframe(
-        data,
-        hide_index=True,
-        column_config={
-            "Data": st.column_config.DatetimeColumn("Data", format="DD.MM.YYYY"),
-            "Clientes": st.column_config.NumberColumn("Clientes", format="%d%%"),
-            "Produtos": st.column_config.NumberColumn("Produtos", format="%d%%"),
-            "Ticket Médio": st.column_config.NumberColumn(
-                "Ticket Médio", format="%d%%"
-            ),
-            "Faturamento": st.column_config.NumberColumn(
-                "Faturamento", format="%d%%"
-            ),
-        },
-    )
+    st.dataframe(data, hide_index=True, use_container_width=True)
