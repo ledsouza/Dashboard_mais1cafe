@@ -37,11 +37,11 @@ if authentication_status:
         with st.form(key="insert_data", clear_on_submit=True):
             date = st.date_input(label='Data')
             date = pd.to_datetime(date)
-            clientes = st.number_input(label='Clientes', max_value=2)
-            produtos = st.number_input(label='Produtos', max_value=2)
-            pa = st.number_input(label='PA', max_value=4)
-            ticket_medio = st.number_input(label='Ticket Médio', max_value=2)
-            faturamento = st.number_input(label='Faturamento', max_value=2)
+            clientes = st.number_input(label='Clientes', max_value=2.0)
+            produtos = st.number_input(label='Produtos', max_value=2.0)
+            pa = st.number_input(label='PA', max_value=4.0)
+            ticket_medio = st.number_input(label='Ticket Médio', max_value=2.0)
+            faturamento = st.number_input(label='Faturamento', max_value=2.0)
 
             submit_button = st.form_submit_button(label="Inserir dados")
 
@@ -74,11 +74,11 @@ if authentication_status:
         with st.form(key="update_data", clear_on_submit=True):
             date = st.date_input(label='Data')
             date = pd.to_datetime(date)
-            clientes = st.number_input(label='Clientes')
-            produtos = st.number_input(label='Produtos')
-            pa = st.number_input(label='PA')
-            ticket_medio = st.number_input(label='Ticket Médio')
-            faturamento = st.number_input(label='Faturamento')
+            clientes = st.number_input(label='Clientes', max_value=2.0)
+            produtos = st.number_input(label='Produtos', max_value=2.0)
+            pa = st.number_input(label='PA', max_value=4.0)
+            ticket_medio = st.number_input(label='Ticket Médio', max_value=2.0)
+            faturamento = st.number_input(label='Faturamento', max_value=2.0)
 
             submit_button = st.form_submit_button(label="Atualizar dados")
 
