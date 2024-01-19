@@ -32,16 +32,18 @@ if authentication_status:
     conn = st.connection("gsheets", type=GSheetsConnection)
 
     insert_tab, update_tab, delete_tab = st.tabs(['Inserir', 'Atualizar', 'Deletar'])
+    metas_max_value = 3.0
+    pa_max_value = 4.0
     
     with insert_tab:
         with st.form(key="insert_data", clear_on_submit=True):
             date = st.date_input(label='Data')
             date = pd.to_datetime(date)
-            clientes = st.number_input(label='Clientes', max_value=2.0)
-            produtos = st.number_input(label='Produtos', max_value=2.0)
-            pa = st.number_input(label='PA', max_value=4.0)
-            ticket_medio = st.number_input(label='Ticket Médio', max_value=2.0)
-            faturamento = st.number_input(label='Faturamento', max_value=2.0)
+            clientes = st.number_input(label='Clientes', max_value=metas_max_value)
+            produtos = st.number_input(label='Produtos', max_value=metas_max_value)
+            pa = st.number_input(label='PA', max_value=pa_max_value)
+            ticket_medio = st.number_input(label='Ticket Médio', max_value=metas_max_value)
+            faturamento = st.number_input(label='Faturamento', max_value=metas_max_value)
 
             submit_button = st.form_submit_button(label="Inserir dados")
 
@@ -70,15 +72,17 @@ if authentication_status:
 
                     st.success("YESSSSS")
 
+    
+
     with update_tab:
         with st.form(key="update_data", clear_on_submit=True):
             date = st.date_input(label='Data')
             date = pd.to_datetime(date)
-            clientes = st.number_input(label='Clientes', max_value=2.0)
-            produtos = st.number_input(label='Produtos', max_value=2.0)
-            pa = st.number_input(label='PA', max_value=4.0)
-            ticket_medio = st.number_input(label='Ticket Médio', max_value=2.0)
-            faturamento = st.number_input(label='Faturamento', max_value=2.0)
+            clientes = st.number_input(label='Clientes', max_value=metas_max_value)
+            produtos = st.number_input(label='Produtos', max_value=metas_max_value)
+            pa = st.number_input(label='PA', max_value=pa_max_value)
+            ticket_medio = st.number_input(label='Ticket Médio', max_value=metas_max_value)
+            faturamento = st.number_input(label='Faturamento', max_value=metas_max_value)
 
             submit_button = st.form_submit_button(label="Atualizar dados")
 
