@@ -2,3 +2,4 @@
 *.json
 generate_keys.py
 /venv
+.venv
