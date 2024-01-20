@@ -38,7 +38,6 @@ if authentication_status is None:
     st.warning("Por favor, insira o usuário e a senha")
 
 if authentication_status:
-
     
     # Crie um objeto de conexão.
     conn = st.connection("gsheets", type=GSheetsConnection)
@@ -65,8 +64,8 @@ if authentication_status:
     filtered_data = data.query(query)
 
     # Processando os dados para que sejam apresentados como percentuais
-    data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
-        data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
+    filtered_data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
+        filtered_data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
     )   
 
     # Gráfico de evolução das metas
