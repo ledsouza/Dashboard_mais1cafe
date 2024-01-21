@@ -8,7 +8,7 @@ from yaml.loader import SafeLoader
 # Funções
 
 def read_data(conn):
-    data = conn.read(usecols=range(6), ttl="0")
+    data = conn.read(usecols=range(8), ttl="0")
     data.dropna(inplace=True)
     data["Data"] = pd.to_datetime(data["Data"], format="%m/%d/%Y")
     data.sort_values(by="Data", ascending=False, inplace=True)
@@ -21,10 +21,12 @@ def get_user_input(metas_max_value, pa_max_value):
     pa = st.number_input(label='PA', max_value=pa_max_value)
     ticket_medio = st.number_input(label='Ticket Médio', max_value=metas_max_value)
     faturamento = st.number_input(label='Faturamento', max_value=metas_max_value)
+    cliente_hora = st.number_input(label='Cliente/Hora')
+    clima = st.selectbox(label='Clima', options=['Ensolarado', 'Nublado', 'Chuvoso', 'Tempestade', 'Vendaval'])
     
-    return date, clientes, produtos, pa, ticket_medio, faturamento
+    return date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima
 
-def update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturamento):
+def update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima):
     updated_data = pd.DataFrame(
         [
             {
@@ -34,6 +36,8 @@ def update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturame
                 "PA": pa,
                 "Ticket Médio": ticket_medio,
                 "Faturamento": faturamento,
+                "Cliente/Hora": cliente_hora,
+                "Clima": clima
             }
         ]
     )
@@ -73,7 +77,7 @@ if authentication_status:
     pa_max_value = 4.0    
     with insert_tab:
         with st.form(key="insert_data", clear_on_submit=True):
-            date, clientes, produtos, pa, ticket_medio, faturamento = get_user_input(metas_max_value, pa_max_value)
+            date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima = get_user_input(metas_max_value, pa_max_value)
 
             submit_button = st.form_submit_button(label="Inserir dados")
             if submit_button:
@@ -81,12 +85,12 @@ if authentication_status:
                 if not data.query('Data == @date').empty:
                     st.error("Dados já existentes para a data inserida")
                 else:                    
-                    update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturamento)
+                    update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima)
                     st.success("YESSSSS")   
 
     with update_tab:
         with st.form(key="update_data", clear_on_submit=True):
-            date, clientes, produtos, pa, ticket_medio, faturamento = get_user_input(metas_max_value, pa_max_value)
+            date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima = get_user_input(metas_max_value, pa_max_value)
 
             submit_button = st.form_submit_button(label="Atualizar dados")
             if submit_button:
@@ -95,7 +99,7 @@ if authentication_status:
                     st.error("Data não encontrada")
                 else:
                     data = data[data['Data'] != date] # Removendo a data para atualizar
-                    update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturamento)
+                    update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima)
                     st.success("YESSSSS")
 
     with delete_tab:
@@ -138,7 +142,9 @@ if authentication_status:
             .format("{:.0f}%", subset=["Clientes", "Produtos", "Ticket Médio", "Faturamento"])
             .format("{:.1f}", subset=["PA"], decimal=",")
             .format("{:%d.%m.%Y}", subset=["Data"])
+            .format("{:.2f}", subset=["Cliente/Hora"], decimal=",")
             )
 
     st.markdown("# Banco de dados")
     st.dataframe(data, hide_index=True, use_container_width=True)
+    st.markdown('Na coluna Cliente/Hora, valores com 0,00 indicam que o dado não foi inserido.')

@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 # Funções
 
 def read_data(conn):
-        data = conn.read(usecols=range(6), ttl="0")
+        data = conn.read(usecols=range(8), ttl="0")
         data.dropna(inplace=True)
         data["Data"] = pd.to_datetime(data["Data"], format="%m/%d/%Y")
         data.sort_values(by="Data", ascending=False, inplace=True)
@@ -129,6 +129,7 @@ if authentication_status:
     st.plotly_chart(fig_dist, use_container_width=True)
 
     # Tabela de estatística descritiva
+    filtered_statistics = filtered_data.query("Cliente/Hora > 0 and Clima != 'Indisponível''")
     statistics = filtered_data.describe().rename(
         index={
             "count": "Contagem Total",
