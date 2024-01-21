@@ -7,8 +7,7 @@ from yaml.loader import SafeLoader
 
 # Funções
 
-def read_data():
-    conn = st.connection("gsheets", type=GSheetsConnection)
+def read_data(conn):
     data = conn.read(usecols=range(8), ttl="0")
     data.dropna(inplace=True)
     data["Data"] = pd.to_datetime(data["Data"], format="%m/%d/%Y")
@@ -27,7 +26,7 @@ def get_user_input(metas_max_value, pa_max_value):
     
     return date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima
 
-def update_data(data, date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima):
+def update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima):
     updated_data = pd.DataFrame(
         [
             {
@@ -44,7 +43,6 @@ def update_data(data, date, clientes, produtos, pa, ticket_medio, faturamento, c
     )
 
     updated_df = pd.concat([data, updated_data], ignore_index=True)
-    conn = st.connection("gsheets", type=GSheetsConnection)
     conn.update(data=updated_df)
 
 st.set_page_config(layout="wide")
@@ -71,21 +69,23 @@ if authentication_status is None:
 if authentication_status:
     authenticator.logout("Logout", "sidebar")
 
-    insert_tab, update_tab, delete_tab = st.tabs(['Inserir', 'Atualizar', 'Deletar'])   
+    conn = st.connection("gsheets", type=GSheetsConnection)
+
+    insert_tab, update_tab, delete_tab = st.tabs(['Inserir', 'Atualizar', 'Deletar'])
+    
     metas_max_value = 3.0
     pa_max_value = 4.0    
-
     with insert_tab:
         with st.form(key="insert_data", clear_on_submit=True):
             date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima = get_user_input(metas_max_value, pa_max_value)
 
             submit_button = st.form_submit_button(label="Inserir dados")
             if submit_button:
-                data = read_data()
+                data = read_data(conn)
                 if not data.query('Data == @date').empty:
                     st.error("Dados já existentes para a data inserida")
                 else:                    
-                    update_data(data, date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima)
+                    update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima)
                     st.success("YESSSSS")   
 
     with update_tab:
@@ -94,12 +94,12 @@ if authentication_status:
 
             submit_button = st.form_submit_button(label="Atualizar dados")
             if submit_button:
-                data = read_data()
+                data = read_data(conn)
                 if data.query('Data == @date').empty:
                     st.error("Data não encontrada")
                 else:
                     data = data[data['Data'] != date] # Removendo a data para atualizar
-                    update_data(data, date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima)
+                    update_data(conn, data, date, clientes, produtos, pa, ticket_medio, faturamento, cliente_hora, clima)
                     st.success("YESSSSS")
 
     with delete_tab:
@@ -108,18 +108,17 @@ if authentication_status:
             
             submit_button = st.form_submit_button(label="Deletar dados")
             if submit_button:
-                data = read_data()
+                data = read_data(conn)
                 if data.query('Data == @date').empty:
                     st.error("Data não encontrada")
                 else:
                     data = data[data['Data'] != date] # Removendo a data selecionada pelo usuário
-                    conn = st.connection("gsheets", type=GSheetsConnection)
                     conn.update(data=data)
 
                     st.success("YESSSSS")
     
     # Banco de dados completa
-    data = read_data()
+    data = read_data(conn)
 
     ## Processando os dados para a visualização da tabela
 
