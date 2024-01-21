@@ -9,12 +9,14 @@ import plotly.graph_objects as go
 
 # Funções
 
+
 def read_data(conn):
-        data = conn.read(usecols=range(8), ttl="0")
-        data.dropna(inplace=True)
-        data["Data"] = pd.to_datetime(data["Data"], format="%m/%d/%Y")
-        data.sort_values(by="Data", ascending=False, inplace=True)
-        return data
+    data = conn.read(usecols=range(8), ttl="0")
+    data.dropna(inplace=True)
+    data["Data"] = pd.to_datetime(data["Data"], format="%m/%d/%Y")
+    data.sort_values(by="Data", ascending=False, inplace=True)
+    return data
+
 
 st.set_page_config(page_title="Dashboard de Metas", layout="wide")
 
@@ -38,11 +40,9 @@ if authentication_status is None:
     st.warning("Por favor, insira o usuário e a senha")
 
 if authentication_status:
-    
     # Crie um objeto de conexão.
     conn = st.connection("gsheets", type=GSheetsConnection)
     data = read_data(conn)
-     
 
     st.sidebar.title("Filtros")
     with st.sidebar:
@@ -66,7 +66,7 @@ if authentication_status:
     # Processando os dados para que sejam apresentados como percentuais
     filtered_data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
         filtered_data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
-    )   
+    )
 
     # Gráfico de evolução das metas
     fig_evolucao_metas = px.line(
@@ -113,7 +113,7 @@ if authentication_status:
                 name="",
                 hovertemplate="Faixa de valores: %{x}%<br>Frequência: %{y}",
                 textposition="outside",
-                texttemplate="%{y}"
+                texttemplate="%{y}",
             )
         ]
     )
@@ -121,16 +121,16 @@ if authentication_status:
         title=title_text,
         xaxis_title="Metas (%)",
         yaxis_title="Contagem",
-        yaxis=dict(
-                showticklabels=False
-        )
+        yaxis=dict(showticklabels=False),
     )
     fig_dist.update_traces(marker_line_width=1, marker_line_color="white")
     st.plotly_chart(fig_dist, use_container_width=True)
 
     # Tabela de estatística descritiva
-    filtered_statistics = filtered_data.query("Cliente/Hora > 0 and Clima != 'Indisponível''")
-    statistics = filtered_data.describe().rename(
+    filtered_statistics = filtered_data.query("`Cliente/Hora` > 0")[
+        ["Clientes", "Produtos", "Ticket Médio", "Faturamento", "Cliente/Hora", "PA"]
+    ]
+    statistics = filtered_statistics.describe().rename(
         index={
             "count": "Contagem Total",
             "mean": "Média",
