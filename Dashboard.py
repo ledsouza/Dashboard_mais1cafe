@@ -127,8 +127,8 @@ if authentication_status:
     st.plotly_chart(fig_dist, use_container_width=True)
 
     # Tabela de estatística descritiva
-    filtered_statistics = filtered_data.query("`Cliente/Hora` > 0")[
-        ["Clientes", "Produtos", "Ticket Médio", "Faturamento", "Cliente/Hora", "PA"]
+    filtered_statistics = filtered_data[
+        ["Clientes", "Produtos", "Ticket Médio", "Faturamento", "PA"]
     ]
     statistics = filtered_statistics.describe().rename(
         index={
