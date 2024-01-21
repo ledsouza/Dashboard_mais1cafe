@@ -128,7 +128,7 @@ if authentication_status:
 
     # Tabela de estatística descritiva
     filtered_statistics = filtered_data[
-        ["Clientes", "Produtos", "Ticket Médio", "Faturamento", "PA"]
+        ["Clientes", "Produtos", "PA", "Ticket Médio", "Faturamento"]
     ]
     statistics = filtered_statistics.describe().rename(
         index={
