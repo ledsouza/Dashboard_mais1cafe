@@ -17,18 +17,46 @@ def read_data(conn):
 def get_user_input(conn, metas_max_value, pa_max_value, selected_metas=['Clientes', 'Produtos', 'PA', 'Ticket Médio', 'Faturamento', 'Cliente/Hora', 'Clima']):
     metas = {}
     data = read_data(conn)
-    
-    metas = {
-        'Data': pd.to_datetime(st.date_input(label='Data')),
-        'Clientes': st.number_input(label='Clientes', max_value=metas_max_value) if 'Clientes' in selected_metas else data.query('Data == @metas["Data"]')['Clientes'].values[0],
-        'Produtos': st.number_input(label='Produtos', max_value=metas_max_value) if 'Produtos' in selected_metas else data.query('Data == @metas["Data"]')['Produtos'].values[0],
-        'PA': st.number_input(label='PA', max_value=pa_max_value) if 'PA' in selected_metas else data.query('Data == @metas["Data"]')['PA'].values[0],
-        'Ticket Médio': st.number_input(label='Ticket Médio', max_value=metas_max_value) if 'Ticket Médio' in selected_metas else data.query('Data == @metas["Data"]')['Ticket Médio'].values[0],
-        'Faturamento': st.number_input(label='Faturamento', max_value=metas_max_value) if 'Faturamento' in selected_metas else data.query('Data == @metas["Data"]')['Faturamento'].values[0],
-        'Cliente/Hora': st.number_input(label='Cliente/Hora') if 'Cliente/Hora' in selected_metas else data.query('Data == @metas["Data"]')['Cliente/Hora'].values[0],
-        'Clima': st.selectbox(label='Clima', options=['Ensolarado', 'Nublado', 'Chuvoso', 'Tempestade', 'Vendaval']) if 'Clima' in selected_metas else data.query('Data == @metas["Data"]')['Clima'].values[0]
-    }
-    
+    metas['Data'] = pd.to_datetime(st.date_input(label='Data'))
+    if data.query('Data == @metas["Data"]').empty and selected_metas is None: 
+        st.error("Dados não existentes para a data inserida")
+        st.stop()
+
+    if 'Clientes' in selected_metas:
+        metas['Clientes'] = st.number_input(label='Clientes', max_value=metas_max_value)
+    else:
+        metas['Clientes'] = data.query('Data == @metas["Data"]')['Clientes'].values[0] if not data.query('Data == @metas["Data"]').empty else None
+
+    if 'Produtos' in selected_metas:
+        metas['Produtos'] = st.number_input(label='Produtos', max_value=metas_max_value)
+    else:
+        metas['Produtos'] = data.query('Data == @metas["Data"]')['Produtos'].values[0] if not data.query('Data == @metas["Data"]').empty else None
+
+    if 'PA' in selected_metas:
+        metas['PA'] = st.number_input(label='PA', max_value=pa_max_value)
+    else:
+        metas['PA'] = data.query('Data == @metas["Data"]')['PA'].values[0] if not data.query('Data == @metas["Data"]').empty else None
+
+    if 'Ticket Médio' in selected_metas:
+        metas['Ticket Médio'] = st.number_input(label='Ticket Médio', max_value=metas_max_value)
+    else:
+        metas['Ticket Médio'] = data.query('Data == @metas["Data"]')['Ticket Médio'].values[0] if not data.query('Data == @metas["Data"]').empty else None
+
+    if 'Faturamento' in selected_metas:
+        metas['Faturamento'] = st.number_input(label='Faturamento', max_value=metas_max_value)
+    else:
+        metas['Faturamento'] = data.query('Data == @metas["Data"]')['Faturamento'].values[0] if not data.query('Data == @metas["Data"]').empty else None
+
+    if 'Cliente/Hora' in selected_metas:
+        metas['Cliente/Hora'] = st.number_input(label='Cliente/Hora')
+    else:
+        metas['Cliente/Hora'] = data.query('Data == @metas["Data"]')['Cliente/Hora'].values[0] if not data.query('Data == @metas["Data"]').empty else None
+
+    if 'Clima' in selected_metas:
+        metas['Clima'] = st.selectbox(label='Clima', options=['Ensolarado', 'Nublado', 'Chuvoso', 'Tempestade', 'Vendaval'])
+    else:
+        metas['Clima'] = data.query('Data == @metas["Data"]')['Clima'].values[0] if not data.query('Data == @metas["Data"]').empty else None
+
     return metas
 
 def update_data(conn, data, metas):
@@ -80,18 +108,22 @@ if authentication_status:
                     st.success("YESSSSS")   
 
     with update_tab:
-        with st.form(key="update_data", clear_on_submit=True):
-            metas = get_user_input(conn, metas_max_value, pa_max_value)
+        selected_metas = st.multiselect(label='Metas', options=['Clientes', 'Produtos', 'PA', 'Ticket Médio', 'Faturamento', 'Cliente/Hora', 'Clima'], placeholder='Selecione as metas que deseja atualizar')
+        if not selected_metas:
+            st.error("É necessário selecionar pelo menos uma meta")
+        else:
+            with st.form(key="update_data", clear_on_submit=True):
+                metas = get_user_input(conn, metas_max_value, pa_max_value, selected_metas)
 
-            submit_button = st.form_submit_button(label="Atualizar dados")
-            if submit_button:
-                data = read_data(conn)
-                if data.query('Data == @metas["Data"]').empty:
-                    st.error("Data não encontrada")
-                else:
-                    data = data[data['Data'] != metas['Data']] # Removendo a data para atualizar
-                    update_data(conn, data, metas)
-                    st.success("YESSSSS")
+                submit_button = st.form_submit_button(label="Atualizar dados")
+                if submit_button:
+                    data = read_data(conn)
+                    if data.query('Data == @metas["Data"]').empty:
+                        st.error("Data não encontrada")
+                    else:
+                        data = data[data['Data'] != metas['Data']] # Removendo a data para atualizar
+                        update_data(conn, data, metas)
+                        st.success("YESSSSS")
 
     with delete_tab:
         with st.form(key="delete_data", clear_on_submit=True):
