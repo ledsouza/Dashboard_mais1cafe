@@ -131,7 +131,34 @@ with db_tab:
     metas_df = pd.DataFrame(collection.find({}, {"_id": 0})).sort_values(
         by="Data", ascending=False
     )
-    st.dataframe(metas_df, hide_index=True, use_container_width=True)
+
+    ## Processando os dados para a visualização da tabela
+
+    ### Adicionado o dia da semana
+    dias_da_semana = {
+        "Monday": "Segunda-feira",
+        "Tuesday": "Terça-feira",
+        "Wednesday": "Quarta-feira",
+        "Thursday": "Quinta-feira",
+        "Friday": "Sexta-feira",
+        "Saturday": "Sábado",
+        "Sunday": "Domingo",
+    }
+    metas_df["Dia da Semana"] = metas_df["Data"].dt.day_name().map(dias_da_semana)
+
+    ### Alterando para porcentagem
+    metas_df[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
+        metas_df[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
+    )
+    metas_s = (metas_df.style
+            .format("{:.0f}%", subset=["Clientes", "Produtos", "Ticket Médio", "Faturamento"])
+            .format("{:.1f}", subset=["PA"], decimal=",")
+            .format("{:%d.%m.%Y}", subset=["Data"])
+            .format("{:.2f}", subset=["Cliente/Hora"], decimal=",")
+            )
+
+    st.dataframe(metas_s, hide_index=True, use_container_width=True)
+    st.markdown('Na coluna Cliente/Hora, valores com 0,00 indicam que o dado não foi inserido.')
 
 #
 
