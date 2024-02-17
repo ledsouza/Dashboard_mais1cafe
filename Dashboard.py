@@ -6,6 +6,7 @@ import streamlit_authenticator as stauth
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from connection import mongo_connection
 
 # Funções
 
@@ -40,37 +41,39 @@ if authentication_status is None:
     st.warning("Por favor, insira o usuário e a senha")
 
 if authentication_status:
-    # Crie um objeto de conexão.
-    conn = st.connection("gsheets", type=GSheetsConnection)
-    data = read_data(conn)
+    authenticator.logout("Logout", "sidebar")
 
-    st.sidebar.title("Filtros")
-    with st.sidebar:
-        periodo = st.date_input(
-            label="Selecione o Período",
-            min_value=data["Data"].min(),
-            max_value=data["Data"].max(),
-            value=(data["Data"].min(), data["Data"].max()),
-        )
-        try:
-            start_date, end_date = periodo
-        except ValueError:
-            st.error("É necessário selecionar um período válido")
-            st.stop()
+    # Conexão com o banco de dados
+    client = mongo_connection()
+    db = client["db_mais1cafe"]
+    collection = db["metas"]
+    metas_df = pd.DataFrame(collection.find({}, {"_id": 0}))
+
+    periodo = st.date_input(
+        label="Selecione o Período",
+        min_value=metas_df["Data"].min(),
+        max_value=metas_df["Data"].max(),
+        value=(metas_df["Data"].min(), metas_df["Data"].max()),
+    )
+    try:
+        start_date, end_date = periodo
+    except ValueError:
+        st.error("É necessário selecionar um período válido")
+        st.stop()
 
     query = """
     @periodo[0] <= Data <= @periodo[1]
     """
-    filtered_data = data.query(query)
+    filtered_df = metas_df.query(query)
 
     # Processando os dados para que sejam apresentados como percentuais
-    filtered_data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
-        filtered_data[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
+    filtered_df[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
+        filtered_df[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
     )
 
     # Gráfico de evolução das metas
     fig_evolucao_metas = px.line(
-        filtered_data,
+        filtered_df,
         x="Data",
         y=["Clientes", "Produtos", "Ticket Médio", "Faturamento"],
         labels={"variable": "Metas"},
@@ -80,7 +83,7 @@ if authentication_status:
         xaxis_title="",
         yaxis_title="Metas (%)",
         xaxis=dict(
-            range=[filtered_data["Data"].min(), filtered_data["Data"].max()],
+            range=[filtered_df["Data"].min(), filtered_df["Data"].max()],
             tickmode="auto",
         ),
     )
@@ -92,9 +95,9 @@ if authentication_status:
     # Adicione uma linha vertical pontilhada vermelha em y=100%
     fig_evolucao_metas.add_shape(
         type="line",
-        x0=filtered_data["Data"].min(),
+        x0=filtered_df["Data"].min(),
         y0=100,
-        x1=filtered_data["Data"].max(),
+        x1=filtered_df["Data"].max(),
         y1=100,
         line=dict(color="red", width=1, dash="dot"),
     )
@@ -102,13 +105,13 @@ if authentication_status:
     st.plotly_chart(fig_evolucao_metas, use_container_width=True)
 
     # Gráfico de distribuição das metas
-    metas = filtered_data.columns[1:6]
+    metas = filtered_df.columns[1:6]
     meta = st.selectbox(label="Selecione a meta", options=metas, index=0)
     title_text = f"Distribuição da Meta de {meta}"
     fig_dist = go.Figure(
         data=[
             go.Histogram(
-                x=filtered_data[meta],
+                x=filtered_df[meta],
                 showlegend=False,
                 name="",
                 hovertemplate="Faixa de valores: %{x}%<br>Frequência: %{y}",
@@ -127,7 +130,7 @@ if authentication_status:
     st.plotly_chart(fig_dist, use_container_width=True)
 
     # Tabela de estatística descritiva
-    filtered_statistics = filtered_data[
+    filtered_statistics = filtered_df[
         ["Clientes", "Produtos", "PA", "Ticket Médio", "Faturamento"]
     ]
     statistics = filtered_statistics.describe().rename(
@@ -149,4 +152,4 @@ if authentication_status:
     st.markdown("# Estatística Descritiva")
     st.dataframe(statistics, use_container_width=True)
 
-    authenticator.logout("Logout", "sidebar")
+    
