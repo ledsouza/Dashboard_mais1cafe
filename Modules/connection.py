@@ -15,7 +15,7 @@ def client_connection():
     mongodb_password = st.secrets['db_credential']['password']
     uri = f"mongodb+srv://ledsouza:{mongodb_password}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
 
-    client = MongoClient(uri, server_api=ServerApi('1'))
+    client = MongoClient(uri, server_api=ServerApi('1'), maxIdleTimeMS=60000*10)
 
     try:
         client.admin.command('ping')
