@@ -62,17 +62,14 @@ def get_user_input(
 
     return metas
 
-
 def update_meta(metas):
     query = {"Data": metas["Data"]}
     update = {"$set": metas}
     update_status = collection.update_one(query, update)
     return update_status.acknowledged
 
-
 metas_max_value = 3.0
 pa_max_value = 4.0
-
 
 insert_tab, update_tab, delete_tab, db_tab = st.tabs(
     ["Inserir", "Atualizar", "Deletar", "Banco de Dados"]

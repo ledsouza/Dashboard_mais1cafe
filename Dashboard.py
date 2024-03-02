@@ -21,16 +21,19 @@ def read_data(conn):
 
 st.set_page_config(page_title="Dashboard de Metas", layout="wide")
 
-# --- Autenticação do usuário ---
-with open(".streamlit/config.yaml") as file:
-    config = yaml.load(file, Loader=SafeLoader)
+def create_authenticator():
+    with open(".streamlit/config.yaml") as file:
+        config = yaml.load(file, Loader=SafeLoader)
 
-    authenticator = stauth.Authenticate(
-        config["credentials"],
-        config["cookie"]["name"],
-        config["cookie"]["key"],
-        config["cookie"]["expiry_days"],
-    )
+        authenticator = stauth.Authenticate(
+            config["credentials"],
+            config["cookie"]["name"],
+            config["cookie"]["key"],
+            config["cookie"]["expiry_days"],
+        )
+    return authenticator
+
+authenticator = create_authenticator()
 
 name, authentication_status, username = authenticator.login("Login", "main")
 
