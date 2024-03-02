@@ -5,8 +5,8 @@ import streamlit_authenticator as stauth
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from MongoDBConnection.connection import database_connection
-from dataviz import metas_evolution_plot, metas_distribution_plot
+from Modules.connection import database_connection
+from Modules.dataviz import metas_evolution_plot, metas_distribution_plot
 from pymongo import DESCENDING, ASCENDING
 
 # Funções
