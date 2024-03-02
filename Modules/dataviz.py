@@ -83,3 +83,37 @@ def metas_distribution_plot(dataframe: pd.DataFrame) -> None:
     fig_dist.update_traces(marker_line_width=1, marker_line_color="white")
     
     st.plotly_chart(fig_dist, use_container_width=True)
+
+class StyledDataframe():
+    """
+    A class that represents a styled dataframe.
+
+    Attributes:
+        dataframe (pd.DataFrame): The dataframe to be styled.
+
+    Methods:
+        apply_style_to_metas(): Applies styling to the dataframe and displays it using Streamlit.
+    """
+
+    def __init__(self, dataframe: pd.DataFrame) -> None:
+        self.dataframe = dataframe
+
+    def apply_style_to_metas(self):
+        """
+        Applies styling to the dataframe and displays it using Streamlit.
+
+        The styling includes formatting specific columns with percentage, decimal, and date formats.
+
+        Returns:
+            None
+        """
+        styled_metas = (
+            self.dataframe.style
+            .format("{:.0f}%", subset=["Clientes", "Produtos", "Ticket Médio", "Faturamento"])
+            .format("{:.1f}", subset=["PA"], decimal=",")
+            .format("{:%d.%m.%Y}", subset=["Data"])
+            .format("{:.2f}", subset=["Cliente/Hora"], decimal=",")
+        )
+
+        st.dataframe(styled_metas, hide_index=True, use_container_width=True)
+        st.markdown('Na coluna Cliente/Hora, valores com 0,00 indicam que o dado não foi inserido.')
