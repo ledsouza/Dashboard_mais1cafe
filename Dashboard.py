@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from MongoDBConnection.connection import database_connection
+from dataviz import fig_metas
 from pymongo import DESCENDING, ASCENDING
 
 # Funções
@@ -69,38 +70,7 @@ if authentication_status:
         filtered_df[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
     )
 
-    # Gráfico de evolução das metas
-    fig_evolucao_metas = px.line(
-        filtered_df,
-        x="Data",
-        y=["Clientes", "Produtos", "Ticket Médio", "Faturamento"],
-        labels={"variable": "Metas"},
-    )
-    fig_evolucao_metas.update_layout(
-        title="Evolução das metas",
-        xaxis_title="",
-        yaxis_title="Metas (%)",
-        xaxis=dict(
-            range=[filtered_df["Data"].min(), filtered_df["Data"].max()],
-            tickmode="auto",
-        ),
-    )
-    fig_evolucao_metas.update_traces(
-        mode="markers+lines",
-        hovertemplate="Data: %{x}<br>Valor: %{y:.0f}%<extra></extra>",
-    )
-
-    # Adicione uma linha vertical pontilhada vermelha em y=100%
-    fig_evolucao_metas.add_shape(
-        type="line",
-        x0=filtered_df["Data"].min(),
-        y0=100,
-        x1=filtered_df["Data"].max(),
-        y1=100,
-        line=dict(color="red", width=1, dash="dot"),
-    )
-
-    st.plotly_chart(fig_evolucao_metas, use_container_width=True)
+    fig_metas(filtered_df)
 
     # Gráfico de distribuição das metas
     metas = filtered_df.columns[1:6]
