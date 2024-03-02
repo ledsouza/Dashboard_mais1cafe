@@ -52,6 +52,15 @@ if authentication_status:
     authenticator.logout("Logout", "sidebar")
 
     def database_connection(collection_name: str):
+        """
+        Establishes a connection to the MongoDB database and returns the specified collection.
+
+        Parameters:
+        collection_name (str): The name of the collection to retrieve.
+
+        Returns:
+        collection: The specified collection from the MongoDB database.
+        """
         client = mongo_connection()
         db = client["db_mais1cafe"]
         collection = db[collection_name]
