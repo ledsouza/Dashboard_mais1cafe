@@ -22,6 +22,12 @@ def read_data(conn):
 st.set_page_config(page_title="Dashboard de Metas", layout="wide")
 
 def create_authenticator():
+    """
+    Create an authenticator object based on the configuration specified in the .streamlit/config.yaml file.
+
+    Returns:
+        authenticator: An authenticator object configured with the credentials and cookie settings from the config file.
+    """
     with open(".streamlit/config.yaml") as file:
         config = yaml.load(file, Loader=SafeLoader)
 
