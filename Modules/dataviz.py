@@ -59,6 +59,15 @@ def metas_evolution_plot(dataframe: pd.DataFrame) -> None:
     st.plotly_chart(fig_evolucao_metas, use_container_width=True)
 
 def metas_distribution_plot(dataframe: pd.DataFrame) -> None:
+    """
+    Plots the distribution of a selected meta from the given dataframe.
+
+    Parameters:
+    dataframe (pd.DataFrame): The dataframe containing the meta data.
+
+    Returns:
+    None
+    """
     metas = dataframe.columns[1:6]
     meta = st.selectbox(label="Selecione a meta", options=metas, index=0)
     title_text = f"Distribuição da Meta de {meta}"
