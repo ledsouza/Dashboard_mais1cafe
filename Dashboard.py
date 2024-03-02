@@ -1,34 +1,10 @@
-import yaml
-from yaml.loader import SafeLoader
 import streamlit as st
-import streamlit_authenticator as stauth
 import pandas as pd
+from Modules.user_authentication import create_authenticator
 from Modules.connection import database_connection
 from Modules.dataviz import metas_evolution_plot, metas_distribution_plot
 from Modules.data_processing import Filtering, descritive_statistics_table
 from pymongo import ASCENDING
-
-# Funções
-
-def create_authenticator():
-    """
-    Create an authenticator object based on the configuration specified in the .streamlit/config.yaml file.
-
-    Returns:
-        authenticator: An authenticator object configured with the credentials and cookie settings from the config file.
-    """
-    with open(".streamlit/config.yaml") as file:
-        config = yaml.load(file, Loader=SafeLoader)
-
-        authenticator = stauth.Authenticate(
-            config["credentials"],
-            config["cookie"]["name"],
-            config["cookie"]["key"],
-            config["cookie"]["expiry_days"],
-        )
-    return authenticator
-
-# App
 
 st.set_page_config(page_title="Dashboard de Metas", layout="wide")
 
