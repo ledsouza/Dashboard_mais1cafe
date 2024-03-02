@@ -142,3 +142,22 @@ class FormMetas:
                             st.success("YESSSSS")
                         else:
                             st.error("Erro ao atualizar os dados")
+    
+    def create_delete_form(self):
+        """
+        Creates a form for deleting data.
+
+        This method creates a Streamlit form that allows the user to input a date and delete the corresponding goal in that data from the collection.
+
+        Returns:
+            None
+        """
+        with st.form(key="delete_data", clear_on_submit=True):
+            date = pd.to_datetime(st.date_input(label="Data"))
+            submit_button = st.form_submit_button(label="Deletar dados")
+            if submit_button:
+                delete_status = self.collection.delete_one({"Data": date})
+                if delete_status.acknowledged:
+                    st.success("YESSSSS")
+                else:
+                    st.error("Erro ao deletar os dados")
