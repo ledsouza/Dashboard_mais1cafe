@@ -1,15 +1,13 @@
 import streamlit as st
 import pandas as pd
-from streamlit_gsheets import GSheetsConnection
-import streamlit_authenticator as stauth
-import yaml
-from yaml.loader import SafeLoader
 from Modules.connection import database_connection
-import time
+from Modules.forms import FormMetas
 
 st.set_page_config(layout="wide")
 
 collection = database_connection("metas")
+
+form_metas = FormMetas()
 
 def get_user_input(
     metas_max_value,
