@@ -1,7 +1,9 @@
 import pandas as pd
 import streamlit as st
 from pymongo.collection import Collection
-
+from pymongo import DESCENDING
+from Modules.data_processing import DataProcessing
+from Modules.dataviz import StyledDataframe
 
 class FormMetas:
     def __init__(self, collection: Collection) -> None:
@@ -152,12 +154,23 @@ class FormMetas:
         Returns:
             None
         """
-        with st.form(key="delete_data", clear_on_submit=True):
-            date = pd.to_datetime(st.date_input(label="Data"))
-            submit_button = st.form_submit_button(label="Deletar dados")
-            if submit_button:
-                delete_status = self.collection.delete_one({"Data": date})
-                if delete_status.acknowledged:
-                    st.success("YESSSSS")
-                else:
-                    st.error("Erro ao deletar os dados")
+        with self.delete_tab:
+            with st.form(key="delete_data", clear_on_submit=True):
+                date = pd.to_datetime(st.date_input(label="Data"))
+                submit_button = st.form_submit_button(label="Deletar dados")
+                if submit_button:
+                    delete_status = self.collection.delete_one({"Data": date})
+                    if delete_status.acknowledged:
+                        st.success("YESSSSS")
+                    else:
+                        st.error("Erro ao deletar os dados")
+
+    def create_database_tab(self):
+        with self.database_tab:
+            metas_dataframe = pd.DataFrame(self.collection.find({}, {"_id": 0}).sort("Data", DESCENDING))
+            data_processing = DataProcessing(metas_dataframe)
+            data_processing.add_week_day()
+            transformed_metas = data_processing.transform_to_percentage()
+
+            metas_styler = StyledDataframe(transformed_metas)
+            metas_styler.apply_style_to_metas()
