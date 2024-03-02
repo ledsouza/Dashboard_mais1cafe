@@ -56,6 +56,10 @@ class Filtering:
             self.dataframe = filtered_dataframe
             return filtered_dataframe
     
+class DataProcessing:
+    def __init__(self, dataframe: pd.DataFrame) -> None:
+        self.dataframe = dataframe
+    
     def transform_to_percentage(self) -> pd.DataFrame:
         """
         Transforms the specified columns in the dataframe to percentages.
@@ -66,6 +70,25 @@ class Filtering:
         self.dataframe[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
             self.dataframe[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
         )
+        return self.dataframe
+    
+    def add_week_day(self) -> pd.DataFrame:
+        """
+        Adds a new column to the dataframe with the corresponding weekday names in Portuguese.
+
+        Returns:
+            pd.DataFrame: The updated dataframe with the new column.
+        """
+        dias_da_semana = {
+            "Monday": "Segunda-feira",
+            "Tuesday": "Terça-feira",
+            "Wednesday": "Quarta-feira",
+            "Thursday": "Quinta-feira",
+            "Friday": "Sexta-feira",
+            "Saturday": "Sábado",
+            "Sunday": "Domingo",
+        }
+        self.dataframe["Dia da Semana"] = self.dataframe["Data"].dt.day_name().map(dias_da_semana)
         return self.dataframe
     
 def descritive_statistics_table(dataframe: pd.DataFrame) -> None:

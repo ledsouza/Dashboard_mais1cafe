@@ -3,7 +3,7 @@ import pandas as pd
 from Modules.user_authentication import create_authenticator
 from Modules.connection import database_connection
 from Modules.dataviz import metas_evolution_plot, metas_distribution_plot
-from Modules.data_processing import Filtering, descritive_statistics_table
+from Modules.data_processing import Filtering, DataProcessing, descritive_statistics_table
 from pymongo import ASCENDING
 
 st.set_page_config(page_title="Dashboard de Metas", layout="wide")
@@ -24,11 +24,11 @@ if authentication_status:
     metas_dataframe = pd.DataFrame(collection.find({}, {"_id": 0}).sort("Data", ASCENDING))
 
     metas_filter = Filtering(metas_dataframe)
-    metas_filter.apply_date_query()
+    filtered_dataframe = metas_filter.apply_date_query()
 
-    filtered_dataframe = metas_filter.transform_to_percentage()
+    transformed_dataframe = DataProcessing(filtered_dataframe).transform_to_percentage()
 
-    metas_evolution_plot(filtered_dataframe)
-    metas_distribution_plot(filtered_dataframe)
+    metas_evolution_plot(transformed_dataframe)
+    metas_distribution_plot(transformed_dataframe)
 
-    descritive_statistics_table(filtered_dataframe)
+    descritive_statistics_table(transformed_dataframe)
