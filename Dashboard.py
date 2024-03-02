@@ -7,7 +7,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from Modules.connection import database_connection
 from Modules.dataviz import metas_evolution_plot, metas_distribution_plot
-from Modules.data_processing import Filtering
+from Modules.data_processing import Filtering, descritive_statistics_table
 from pymongo import DESCENDING, ASCENDING
 
 # Funções
@@ -47,40 +47,16 @@ if authentication_status:
     authenticator.logout("Logout", "sidebar")
     
     collection = database_connection('metas')
-    metas_df = pd.DataFrame(collection.find({}, {"_id": 0}).sort("Data", ASCENDING))
+    metas_dataframe = pd.DataFrame(collection.find({}, {"_id": 0}).sort("Data", ASCENDING))
 
-    metas_filter = Filtering(metas_df)
-    filtered_df = metas_filter.apply_date_query()
+    metas_filter = Filtering(metas_dataframe)
+    metas_filter.apply_date_query()
 
-    # Processando os dados para que sejam apresentados como percentuais
-    filtered_df[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
-        filtered_df[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
-    )
+    filtered_dataframe = metas_filter.transform_to_percentage()
 
-    metas_evolution_plot(filtered_df)
-    metas_distribution_plot(filtered_df)
+    metas_evolution_plot(filtered_dataframe)
+    metas_distribution_plot(filtered_dataframe)
 
-    # Tabela de estatística descritiva
-    filtered_statistics = filtered_df[
-        ["Clientes", "Produtos", "PA", "Ticket Médio", "Faturamento"]
-    ]
-    statistics = filtered_statistics.describe().rename(
-        index={
-            "count": "Contagem Total",
-            "mean": "Média",
-            "std": "Desvio Padrão",
-            "min": "Mínimo",
-            "max": "Máximo",
-        }
-    )
-    statistics = (
-        statistics.iloc[1:, :]
-        .style.format(
-            "{:.0f}%", subset=["Clientes", "Produtos", "Ticket Médio", "Faturamento"]
-        )
-        .format("{:.1f}", subset=["PA"], decimal=",")
-    )
-    st.markdown("# Estatística Descritiva")
-    st.dataframe(statistics, use_container_width=True)
+    descritive_statistics_table(filtered_dataframe)
 
     
