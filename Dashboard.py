@@ -1,25 +1,14 @@
 import yaml
 from yaml.loader import SafeLoader
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
 import streamlit_authenticator as stauth
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from connection import mongo_connection
+from MongoDBConnection.connection import database_connection
+from pymongo import DESCENDING, ASCENDING
 
 # Funções
-
-
-def read_data(conn):
-    data = conn.read(usecols=range(8), ttl="0")
-    data.dropna(inplace=True)
-    data["Data"] = pd.to_datetime(data["Data"], format="%m/%d/%Y")
-    data.sort_values(by="Data", ascending=False, inplace=True)
-    return data
-
-
-st.set_page_config(page_title="Dashboard de Metas", layout="wide")
 
 def create_authenticator():
     """
@@ -39,6 +28,10 @@ def create_authenticator():
         )
     return authenticator
 
+# App
+
+st.set_page_config(page_title="Dashboard de Metas", layout="wide")
+
 authenticator = create_authenticator()
 name, authentication_status, username = authenticator.login("Login", "main")
 
@@ -50,24 +43,9 @@ if authentication_status is None:
 
 if authentication_status:
     authenticator.logout("Logout", "sidebar")
-
-    def database_connection(collection_name: str):
-        """
-        Establishes a connection to the MongoDB database and returns the specified collection.
-
-        Parameters:
-        collection_name (str): The name of the collection to retrieve.
-
-        Returns:
-        collection: The specified collection from the MongoDB database.
-        """
-        client = mongo_connection()
-        db = client["db_mais1cafe"]
-        collection = db[collection_name]
-        return collection
     
     collection = database_connection('metas')
-    metas_df = pd.DataFrame(collection.find({}, {"_id": 0}))
+    metas_df = pd.DataFrame(collection.find({}, {"_id": 0}).sort("Data", ASCENDING))
 
     periodo = st.date_input(
         label="Selecione o Período",

@@ -4,16 +4,12 @@ from streamlit_gsheets import GSheetsConnection
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
-from connection import mongo_connection
+from MongoDBConnection.connection import database_connection
 import time
 
 st.set_page_config(layout="wide")
 
-# Conexão com o banco de dados
-client = mongo_connection()
-db = client["db_mais1cafe"]
-collection = db["metas"]
-
+collection = database_connection("metas")
 
 def get_user_input(
     metas_max_value,
