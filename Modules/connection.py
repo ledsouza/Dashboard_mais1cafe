@@ -1,5 +1,4 @@
-from dotenv import load_dotenv
-import os
+import streamlit as st
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
@@ -13,9 +12,8 @@ def client_connection():
     Raises:
         Exception: If there is an error connecting to MongoDB.
     """
-    load_dotenv()
-
-    uri = f"mongodb+srv://ledsouza:{os.getenv('MONGODB_PASSWORD')}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
+    mongodb_password = st.secrets['db_credential']['password']
+    uri = f"mongodb+srv://ledsouza:{mongodb_password}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
 
     client = MongoClient(uri, server_api=ServerApi('1'))
 
