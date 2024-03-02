@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from MongoDBConnection.connection import database_connection
-from dataviz import fig_metas
+from dataviz import metas_evolution_plot, metas_distribution_plot
 from pymongo import DESCENDING, ASCENDING
 
 # Funções
@@ -70,32 +70,8 @@ if authentication_status:
         filtered_df[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] * 100
     )
 
-    fig_metas(filtered_df)
-
-    # Gráfico de distribuição das metas
-    metas = filtered_df.columns[1:6]
-    meta = st.selectbox(label="Selecione a meta", options=metas, index=0)
-    title_text = f"Distribuição da Meta de {meta}"
-    fig_dist = go.Figure(
-        data=[
-            go.Histogram(
-                x=filtered_df[meta],
-                showlegend=False,
-                name="",
-                hovertemplate="Faixa de valores: %{x}%<br>Frequência: %{y}",
-                textposition="outside",
-                texttemplate="%{y}",
-            )
-        ]
-    )
-    fig_dist.update_layout(
-        title=title_text,
-        xaxis_title="Metas (%)",
-        yaxis_title="Contagem",
-        yaxis=dict(showticklabels=False),
-    )
-    fig_dist.update_traces(marker_line_width=1, marker_line_color="white")
-    st.plotly_chart(fig_dist, use_container_width=True)
+    metas_evolution_plot(filtered_df)
+    metas_distribution_plot(filtered_df)
 
     # Tabela de estatística descritiva
     filtered_statistics = filtered_df[

@@ -24,7 +24,7 @@ def add_vertical_line(fig: go.Figure, dataframe: pd.DataFrame) -> go.Figure:
     )
     return fig
 
-def fig_metas(dataframe: pd.DataFrame) -> None:
+def metas_evolution_plot(dataframe: pd.DataFrame) -> None:
     """
     Generate a line chart to visualize the evolution of goals.
 
@@ -57,3 +57,29 @@ def fig_metas(dataframe: pd.DataFrame) -> None:
     fig_evolucao_metas = add_vertical_line(fig_evolucao_metas, dataframe)
 
     st.plotly_chart(fig_evolucao_metas, use_container_width=True)
+
+def metas_distribution_plot(dataframe: pd.DataFrame) -> None:
+    metas = dataframe.columns[1:6]
+    meta = st.selectbox(label="Selecione a meta", options=metas, index=0)
+    title_text = f"Distribuição da Meta de {meta}"
+    fig_dist = go.Figure(
+        data=[
+            go.Histogram(
+                x=dataframe[meta],
+                showlegend=False,
+                name="",
+                hovertemplate="Faixa de valores: %{x}%<br>Frequência: %{y}",
+                textposition="outside",
+                texttemplate="%{y}",
+            )
+        ]
+    )
+    fig_dist.update_layout(
+        title=title_text,
+        xaxis_title="Metas (%)",
+        yaxis_title="Contagem",
+        yaxis=dict(showticklabels=False),
+    )
+    fig_dist.update_traces(marker_line_width=1, marker_line_color="white")
+    
+    st.plotly_chart(fig_dist, use_container_width=True)
