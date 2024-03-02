@@ -3,12 +3,10 @@ from yaml.loader import SafeLoader
 import streamlit as st
 import streamlit_authenticator as stauth
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 from Modules.connection import database_connection
 from Modules.dataviz import metas_evolution_plot, metas_distribution_plot
 from Modules.data_processing import Filtering, descritive_statistics_table
-from pymongo import DESCENDING, ASCENDING
+from pymongo import ASCENDING
 
 # Funções
 
@@ -58,5 +56,3 @@ if authentication_status:
     metas_distribution_plot(filtered_dataframe)
 
     descritive_statistics_table(filtered_dataframe)
-
-    
