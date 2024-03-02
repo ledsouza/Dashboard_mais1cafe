@@ -7,6 +7,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from Modules.connection import database_connection
 from Modules.dataviz import metas_evolution_plot, metas_distribution_plot
+from Modules.data_processing import Filtering
 from pymongo import DESCENDING, ASCENDING
 
 # Funções
@@ -48,22 +49,8 @@ if authentication_status:
     collection = database_connection('metas')
     metas_df = pd.DataFrame(collection.find({}, {"_id": 0}).sort("Data", ASCENDING))
 
-    periodo = st.date_input(
-        label="Selecione o Período",
-        min_value=metas_df["Data"].min(),
-        max_value=metas_df["Data"].max(),
-        value=(metas_df["Data"].min(), metas_df["Data"].max()),
-    )
-    try:
-        start_date, end_date = periodo
-    except ValueError:
-        st.error("É necessário selecionar um período válido")
-        st.stop()
-
-    query = """
-    @periodo[0] <= Data <= @periodo[1]
-    """
-    filtered_df = metas_df.query(query)
+    metas_filter = Filtering(metas_df)
+    filtered_df = metas_filter.apply_date_query()
 
     # Processando os dados para que sejam apresentados como percentuais
     filtered_df[["Clientes", "Produtos", "Ticket Médio", "Faturamento"]] = (
