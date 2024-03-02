@@ -34,7 +34,6 @@ def create_authenticator():
     return authenticator
 
 authenticator = create_authenticator()
-
 name, authentication_status, username = authenticator.login("Login", "main")
 
 if authentication_status is False:
@@ -46,10 +45,13 @@ if authentication_status is None:
 if authentication_status:
     authenticator.logout("Logout", "sidebar")
 
-    # Conexão com o banco de dados
-    client = mongo_connection()
-    db = client["db_mais1cafe"]
-    collection = db["metas"]
+    def database_connection(collection_name: str):
+        client = mongo_connection()
+        db = client["db_mais1cafe"]
+        collection = db[collection_name]
+        return collection
+    
+    collection = database_connection('metas')
     metas_df = pd.DataFrame(collection.find({}, {"_id": 0}))
 
     periodo = st.date_input(
