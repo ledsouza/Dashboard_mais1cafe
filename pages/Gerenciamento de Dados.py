@@ -1,6 +1,6 @@
 import streamlit as st
 from Modules.user_authentication import create_authenticator
-from Modules.connection import client_connection, database_connection
+from Modules.connection import client_connection
 from Modules.forms import FormMetas
 
 st.set_page_config(layout="wide")

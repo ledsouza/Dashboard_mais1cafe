@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from Modules.user_authentication import create_authenticator
-from Modules.connection import database_connection
+from Modules.connection import client_connection
 from Modules.dataviz import metas_evolution_plot, metas_distribution_plot
 from Modules.data_processing import Filtering, DataProcessing, descritive_statistics_table
 from pymongo import ASCENDING
@@ -20,7 +20,12 @@ if authentication_status is None:
 if authentication_status:
     authenticator.logout("Logout", "sidebar")
     
-    collection = database_connection('metas')
+    mongodb_password = st.secrets['db_credential']['password']
+    uri = f"mongodb+srv://ledsouza:{mongodb_password}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
+    client = client_connection(uri)
+    db = client["db_mais1cafe"]
+    collection = db["metas"]
+
     metas_dataframe = pd.DataFrame(collection.find({}, {"_id": 0}).sort("Data", ASCENDING))
 
     metas_filter = Filtering(metas_dataframe)
