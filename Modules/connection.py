@@ -2,7 +2,7 @@ import streamlit as st
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-def client_connection():
+def client_connection() -> MongoClient:
     """
     Establishes a connection to MongoDB using the provided credentials.
 
