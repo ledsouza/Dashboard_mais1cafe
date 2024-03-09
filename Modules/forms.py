@@ -157,11 +157,7 @@ class FormMetas:
                     self.get_user_input(selected_metas)
                     submit_button = st.form_submit_button(label="Atualizar dados")
                     if submit_button:
-                        update_status = self.update_meta()
-                        if update_status:
-                            st.success("YESSSSS")
-                        else:
-                            st.error("Erro ao atualizar os dados")
+                        self.update_meta()
     
     def create_delete_form(self):
         """
