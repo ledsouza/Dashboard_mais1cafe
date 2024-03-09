@@ -86,6 +86,7 @@ class FormMetas:
         if update_status.modified_count == 0:
             raise Exception('Os dados para a data selecionada não existem')
         else:
+            st.success("YESSSSS")
             return True
         
     def insert_meta(self, session=None):
