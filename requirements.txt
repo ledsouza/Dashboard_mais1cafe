@@ -65,3 +65,4 @@ validators==0.22.0
 watchdog==3.0.0
 zipp==3.17.0
 pymongo==4.6.1
+pytest==8.1.1
