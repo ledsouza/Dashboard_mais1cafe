@@ -97,7 +97,7 @@ def test_insert_meta_valid_date(mongodb, rollback_session):
     collection = mongodb.db_mais1cafe.metas
 
     metas = {
-        "Data": pd.to_datetime(date(2024, 1, 31)),
+        "Data": pd.to_datetime(date(2020, 1, 31)),
         "Clientes": 1.0,
         "Produtos": 1.0,
         "PA": 1.0,
