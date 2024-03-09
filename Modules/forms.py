@@ -84,7 +84,7 @@ class FormMetas:
         update = {"$set": self.metas}
         update_status = self.collection.update_one(query, update, session=session)
         if update_status.modified_count == 0:
-            return False
+            raise Exception('Os dados para a data selecionada não existem')
         else:
             return True
         

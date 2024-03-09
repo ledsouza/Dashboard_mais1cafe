@@ -81,8 +81,9 @@ def test_update_meta_invalid_date(mongodb, rollback_session):
     form_metas = FormMetas(collection)
     form_metas.metas = metas
 
-    update_status = form_metas.update_meta(session=rollback_session)
-    assert update_status == False
+    with pytest.raises(Exception) as excinfo:
+        form_metas.update_meta(session=rollback_session)
+        assert str(excinfo.value) == 'Os dados para a data selecionada não existem'
 
 def test_insert_meta_valid_date(mongodb, rollback_session):
     """
