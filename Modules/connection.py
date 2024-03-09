@@ -1,5 +1,6 @@
 import streamlit as st
 from pymongo.mongo_client import MongoClient
+from pymongo.collection import Collection
 from pymongo.server_api import ServerApi
 
 def client_connection() -> MongoClient:
@@ -24,18 +25,19 @@ def client_connection() -> MongoClient:
     except Exception as e:
         print(e)
 
-def database_connection(collection_name: str):
+def database_connection(collection_name: str) -> tuple[MongoClient, Collection]:
         """
-        Establishes a connection to the MongoDB database and returns the specified collection.
+        Establishes a connection to the MongoDB database and returns the specified client and collection.
 
         Parameters:
         collection_name (str): The name of the collection to retrieve.
 
         Returns:
+        client: The MongoDB client object.
         collection: The specified collection from the MongoDB database.
         """
         client = client_connection()
         db = client["db_mais1cafe"]
         collection = db[collection_name]
-        return collection
+        return client, collection
         
