@@ -1,15 +1,83 @@
 from Modules.forms import FormMetas
 from streamlit.testing.v1 import AppTest
-import pytest
+from datetime import date
+import pandas as pd
 
-def test_get_user_input(run_app: AppTest):
-    form_metas = FormMetas()
-    user_input = form_metas.get_user_input()
-    assert user_input == {
-        "Data": "2021-08-01",
+def test_get_user_input(mongodb):
+    """
+    Test case for the get_user_input method of the FormMetas class.
+
+    This test verifies that the get_user_input method of the FormMetas class
+    runs without raising an exception.
+
+    Args:
+        mongodb: The MongoDB fixture.
+
+    Returns:
+        None
+    """
+    collection = mongodb.db_mais1cafe.metas
+    form_metas = FormMetas(collection)
+    at = AppTest.from_function(form_metas.get_user_input)
+    at.run()
+    assert not at.exception
+
+def test_update_meta_valid_date(mongodb, rollback_session):
+    """
+    Test case for updating meta with a valid date.
+
+    Args:
+        mongodb: The MongoDB instance.
+        rollback_session: The rollback session.
+
+    Returns:
+        None
+    """
+    collection = mongodb.db_mais1cafe.metas
+
+    metas = {
+        "Data": pd.to_datetime(date(2024, 1, 31)),
         "Clientes": 1.0,
         "Produtos": 1.0,
         "PA": 1.0,
         "Ticket Médio": 1.0,
         "Faturamento": 1.0,
+        "Cliente/Hora": 1.0,
+        "Clima": "Ensolarado"
     }
+
+    form_metas = FormMetas(collection)
+    form_metas.metas = metas
+
+    update_status = form_metas.update_meta(session=rollback_session)
+    assert update_status
+
+def test_update_meta_invalid_date(mongodb, rollback_session):
+    """
+    Test case for updating meta with an invalid date.
+
+    Args:
+        mongodb: The MongoDB instance.
+        rollback_session: The rollback session.
+
+    Returns:
+        None
+    """
+    collection = mongodb.db_mais1cafe.metas
+
+    metas = {
+        "Data": pd.to_datetime(date(2020, 1, 31)),
+        "Clientes": 1.0,
+        "Produtos": 1.0,
+        "PA": 1.0,
+        "Ticket Médio": 1.0,
+        "Faturamento": 1.0,
+        "Cliente/Hora": 1.0,
+        "Clima": "Ensolarado"
+    }
+
+    form_metas = FormMetas(collection)
+    form_metas.metas = metas
+
+    update_status = form_metas.update_meta(session=rollback_session)
+    assert update_status == False

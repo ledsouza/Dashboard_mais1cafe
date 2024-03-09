@@ -4,3 +4,4 @@ generate_keys.py
 /venv
 .venv
 .env
+notebooks/

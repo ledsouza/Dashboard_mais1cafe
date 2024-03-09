@@ -73,7 +73,7 @@ class FormMetas:
 
         return self.metas
 
-    def update_meta(self):
+    def update_meta(self, session=None):
         """
         Updates the goal in the collection.
 
@@ -82,8 +82,11 @@ class FormMetas:
         """
         query = {"Data": self.metas["Data"]}
         update = {"$set": self.metas}
-        update_status = self.collection.update_one(query, update)
-        return update_status.acknowledged
+        update_status = self.collection.update_one(query, update, session=session)
+        if update_status.modified_count == 0:
+            return False
+        else:
+            return True
     
     def create_insert_form(self):
         """
