@@ -1,6 +1,6 @@
 import streamlit as st
 from Modules.user_authentication import create_authenticator
-from Modules.connection import database_connection
+from Modules.connection import client_connection, database_connection
 from Modules.forms import FormMetas
 
 st.set_page_config(layout="wide")
@@ -16,7 +16,12 @@ if authentication_status is None:
 
 if authentication_status:
     authenticator.logout("Logout", "sidebar")
-    collection = database_connection("metas")
+
+    mongodb_password = st.secrets['db_credential']['password']
+    uri = f"mongodb+srv://ledsouza:{mongodb_password}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
+    client = client_connection(uri)
+    db = client["db_mais1cafe"]
+    collection = db["metas"]
 
     form_metas = FormMetas(collection)
 

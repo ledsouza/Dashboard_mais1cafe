@@ -3,7 +3,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.collection import Collection
 from pymongo.server_api import ServerApi
 
-def client_connection() -> MongoClient:
+def client_connection(uri) -> MongoClient:
     """
     Establishes a connection to MongoDB using the provided credentials.
 
@@ -13,9 +13,6 @@ def client_connection() -> MongoClient:
     Raises:
         Exception: If there is an error connecting to MongoDB.
     """
-    mongodb_password = st.secrets['db_credential']['password']
-    uri = f"mongodb+srv://ledsouza:{mongodb_password}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
-
     client = MongoClient(uri, server_api=ServerApi('1'), maxIdleTimeMS=60000*10)
 
     try:
