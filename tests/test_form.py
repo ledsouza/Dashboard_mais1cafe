@@ -3,6 +3,7 @@ from streamlit.testing.v1 import AppTest
 from datetime import date
 import pandas as pd
 import pytest
+from unittest.mock import MagicMock
 
 def test_get_user_input(mongodb):
     """
@@ -113,6 +114,40 @@ def test_insert_meta_valid_date(mongodb, rollback_session):
     insert_status = form_metas.insert_meta(session=rollback_session)
     assert insert_status
 
+def test_insert_meta_valid_date_with_exception(rollback_session):
+    """
+    Test case for inserting meta with a valid date and an exception.
+
+    Args:
+        mongodb: The MongoDB instance.
+        rollback_session: The rollback session.
+
+    Returns:
+        None
+    """
+    mock_mongodb = MagicMock()
+    mock_mongodb.insert_meta.side_effect = Exception("Erro ao inserir os dados")
+    collection = mock_mongodb.db_mais1cafe.metas
+
+    metas = {
+        "Data": pd.to_datetime(date(2020, 1, 31)),
+        "Clientes": 1.0,
+        "Produtos": 1.0,
+        "PA": 1.0,
+        "Ticket Médio": 1.0,
+        "Faturamento": 1.0,
+        "Cliente/Hora": 1.0,
+        "Clima": "Ensolarado"
+    }
+
+    form_metas = FormMetas(collection)
+    form_metas.metas = metas
+
+    with pytest.raises(Exception) as excinfo:
+        form_metas.insert_meta(session=rollback_session)
+        assert str(excinfo.value) == 'Erro ao inserir os dados'
+    
+
 def test_insert_meta_invalid_date(mongodb, rollback_session):
     """
     Test case for inserting meta with an invalid date.
@@ -140,5 +175,6 @@ def test_insert_meta_invalid_date(mongodb, rollback_session):
     form_metas = FormMetas(collection)
     form_metas.metas = metas
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception) as excinfo:
         form_metas.insert_meta(session=rollback_session)
+        assert str(excinfo.value) == 'Os dados para a data selecionada já existem'

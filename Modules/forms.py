@@ -101,9 +101,10 @@ class FormMetas:
         else:
             insert_status = self.collection.insert_one(self.metas, session=session)
             if insert_status.inserted_id:
+                st.success("YESSSSS")
                 return True
             else:
-                return False
+                raise Exception('Erro ao inserir os dados')
     
     def create_insert_form(self):
         """
@@ -121,11 +122,7 @@ class FormMetas:
                 self.get_user_input()
                 submit_button = st.form_submit_button(label="Inserir dados")
                 if submit_button:
-                    insert_status = self.collection.insert_one(self.metas)
-                    if insert_status.acknowledged:
-                        st.success("YESSSSS")
-                    else:
-                        st.error("Erro ao inserir os dados")
+                    self.insert_meta()
 
     def create_update_form(self):
         """
