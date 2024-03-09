@@ -1,8 +1,3 @@
-import streamlit as st
-import pymongo
-from unittest.mock import patch
-import pytest
-
 def test_update_mongodb(mongodb, rollback_session):
     mongodb.db_mais1cafe.metas.insert_one(
         {
