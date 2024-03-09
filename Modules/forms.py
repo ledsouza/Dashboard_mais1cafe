@@ -87,6 +87,23 @@ class FormMetas:
             return False
         else:
             return True
+        
+    def insert_meta(self, session=None):
+        """
+        Inserts the goal in the collection.
+
+        Returns:
+            bool: True if the insertion was successful, False otherwise.
+        """
+        search_result = self.collection.find_one({"Data": self.metas["Data"]})
+        if search_result is not None:
+            raise Exception('Os dados para a data selecionada já existem')
+        else:
+            insert_status = self.collection.insert_one(self.metas, session=session)
+            if insert_status.inserted_id:
+                return True
+            else:
+                return False
     
     def create_insert_form(self):
         """
