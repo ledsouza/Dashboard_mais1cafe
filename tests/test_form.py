@@ -176,3 +176,22 @@ def test_insert_meta_invalid_date(mongodb, rollback_session):
     with pytest.raises(Exception) as excinfo:
         form_metas.insert_meta(session=rollback_session)
         assert str(excinfo.value) == 'Os dados para a data selecionada já existem'
+
+def test_delete_meta_valid_date(mongodb, rollback_session):
+    """
+    Test case for deleting meta with a valid date.
+
+    Args:
+        mongodb: The MongoDB instance.
+        rollback_session: The rollback session.
+
+    Returns:
+        None
+    """
+    collection = mongodb.db_mais1cafe.metas
+
+    form_metas = FormMetas(collection)
+    test_date = pd.to_datetime(date(2024, 1, 31))
+
+    delete_status = form_metas.delete_meta(date=test_date, session=rollback_session)
+    assert delete_status
