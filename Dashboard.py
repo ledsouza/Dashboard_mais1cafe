@@ -19,11 +19,13 @@ if authentication_status is None:
 
 if authentication_status:
     authenticator.logout("Logout", "sidebar")
+
+    if 'client' not in st.session_state:
+        mongodb_password = st.secrets['db_credential']['password']
+        uri = f"mongodb+srv://ledsouza:{mongodb_password}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
+        st.session_state.client = client_connection(uri)
     
-    mongodb_password = st.secrets['db_credential']['password']
-    uri = f"mongodb+srv://ledsouza:{mongodb_password}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
-    client = client_connection(uri)
-    db = client["db_mais1cafe"]
+    db = st.session_state.client["db_mais1cafe"]
     collection = db["metas"]
 
     metas_dataframe = pd.DataFrame(collection.find({}, {"_id": 0}).sort("Data", ASCENDING))
@@ -37,3 +39,6 @@ if authentication_status:
     metas_distribution_plot(transformed_dataframe)
 
     descritive_statistics_table(transformed_dataframe)
+
+    st.session_state.client.close()
+    del st.session_state.client
