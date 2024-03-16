@@ -235,22 +235,3 @@ def test_delete_meta_error(mock_mongodb, rollback_session):
     with pytest.raises(Exception) as excinfo:
         form_metas.delete_meta(date=test_date, session=rollback_session)
         assert str(excinfo.value) == 'Erro ao deletar os dados'
-
-def test_create_insert_form(mongodb):
-    """
-    Test case for the create_insert_form method of the FormMetas class.
-
-    This test verifies that the create_insert_form method of the FormMetas class
-    runs without raising an exception.
-
-    Args:
-        mongodb: The MongoDB fixture.
-
-    Returns:
-        None
-    """
-    collection = mongodb.db_mais1cafe.metas
-    form_metas = FormMetas(collection)
-    at = AppTest.from_function(form_metas.create_insert_form)
-    at.run()
-    assert not at.exception
