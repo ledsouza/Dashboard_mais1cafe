@@ -78,8 +78,15 @@ class FormMetas:
         """
         Updates the goal in the collection.
 
+        Args:
+            session (optional): The session to use for the update operation.
+
         Returns:
-            bool: True if the update was successful, False otherwise.
+            bool: True if the update was successful.
+
+        Raises:
+            Exception: If the data for the selected date does not exist.
+
         """
         query = {"Data": self.metas["Data"]}
         update = {"$set": self.metas}
@@ -129,12 +136,20 @@ class FormMetas:
             session (optional): The session to use for the deletion.
 
         Returns:
-            bool: True if the deletion was successful, False otherwise.
+            bool: True if the deletion was successful.
 
         Raises:
             Exception: If the deletion was unsuccessful.
 
         """
+        try:
+            search_result = self.collection.find_one({"Data": date})
+            if search_result is None:
+                raise Exception('Os dados para a data selecionada não existem')
+        except Exception as e:
+            st.error(e)
+            st.rerun()
+        
         delete_status = self.collection.delete_one({"Data": date}, session=session)
         if delete_status.deleted_count == 0:
             raise Exception('Erro ao deletar os dados')
