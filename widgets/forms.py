@@ -173,7 +173,9 @@ class FormMetas:
                 self.get_user_input()
                 submit_button = st.form_submit_button(label="Inserir dados")
                 if submit_button:
+                    st.write('Teste')
                     self.insert_meta()
+                    st.write('Teste2')
 
     def create_update_form(self):
         """
