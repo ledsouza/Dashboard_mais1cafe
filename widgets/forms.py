@@ -42,7 +42,7 @@ class FormMetas:
 
         if "Clientes" in selected_metas:
             self.metas["Clientes"] = st.number_input(
-                label="Clientes", max_value=self.metas_max_value
+                label="Clientes", max_value=self.metas_max_value, key="Clientes"
             )
 
         if "Produtos" in selected_metas:
@@ -223,11 +223,7 @@ class FormMetas:
                 date = pd.to_datetime(st.date_input(label="Data"))
                 submit_button = st.form_submit_button(label="Deletar dados")
                 if submit_button:
-                    delete_status = self.collection.delete_one({"Data": date})
-                    if delete_status.acknowledged:
-                        st.success(self.success_message)
-                    else:
-                        st.error("Erro ao deletar os dados")
+                    self.delete_meta(date)
 
     def create_database_tab(self):
         with self.database_tab:

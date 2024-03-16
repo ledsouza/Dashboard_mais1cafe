@@ -1,7 +1,17 @@
 from widgets.forms import FormMetas
+from streamlit.testing.v1 import AppTest
 from datetime import date
 import pandas as pd
 import pytest
+
+def test_get_user_input(mongodb):    
+    collection = mongodb.db_mais1cafe.metas
+    form_metas = FormMetas(collection)
+    at = AppTest.from_file('widgets/forms.py')
+    at.from_function(form_metas.get_user_input)
+    at.run()
+
+    assert not at.exception
 
 def test_update_meta_valid_date(mongodb, rollback_session):
     """
@@ -215,3 +225,79 @@ def test_delete_meta_error(mock_mongodb, rollback_session):
     with pytest.raises(Exception) as excinfo:
         form_metas.delete_meta(date=test_date, session=rollback_session)
         assert str(excinfo.value) == 'Erro ao deletar os dados'
+
+def test_create_insert_form_widget(mongodb):
+    """
+    Test case for creating the insert form.
+
+    Args:
+        mongodb: The MongoDB instance.
+
+    Returns:
+        None
+    """
+    collection = mongodb.db_mais1cafe.metas
+
+    form_metas = FormMetas(collection)
+    at = AppTest.from_file('widgets/forms.py')
+    at.from_function(form_metas.create_insert_form)
+    at.run()
+
+    assert not at.exception
+
+def test_create_update_form_widget(mongodb):
+    """
+    Test case for creating the update form.
+
+    Args:
+        mongodb: The MongoDB instance.
+
+    Returns:
+        None
+    """
+    collection = mongodb.db_mais1cafe.metas
+
+    form_metas = FormMetas(collection)
+    at = AppTest.from_file('widgets/forms.py')
+    at.from_function(form_metas.create_update_form)
+    at.run()
+
+    assert not at.exception
+
+def test_create_delete_form_widget(mongodb):
+    """
+    Test case for creating the delete form.
+
+    Args:
+        mongodb: The MongoDB instance.
+
+    Returns:
+        None
+    """
+    collection = mongodb.db_mais1cafe.metas
+
+    form_metas = FormMetas(collection)
+    at = AppTest.from_file('widgets/forms.py')
+    at.from_function(form_metas.create_delete_form)
+    at.run()
+
+    assert not at.exception
+
+def test_create_database_tab_widget(mongodb):
+    """
+    Test case for creating the database tab.
+
+    Args:
+        mongodb: The MongoDB instance.
+
+    Returns:
+        None
+    """
+    collection = mongodb.db_mais1cafe.metas
+
+    form_metas = FormMetas(collection)
+    at = AppTest.from_file('widgets/forms.py')
+    at.from_function(form_metas.create_database_tab)
+    at.run()
+
+    assert not at.exception
