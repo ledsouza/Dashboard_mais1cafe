@@ -169,6 +169,7 @@ class FormMetas:
         Returns:
             None
         """
+        print(self.insert_tab)
         with self.insert_tab:
             with st.form(key="insert_data", clear_on_submit=True):
                 self.get_user_input()

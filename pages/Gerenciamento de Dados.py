@@ -21,7 +21,7 @@ if authentication_status:
         mongodb_password = st.secrets['db_credential']['password']
         uri = f"mongodb+srv://ledsouza:{mongodb_password}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
         st.session_state.client = client_connection(uri)
-
+    
     db = st.session_state.client["db_mais1cafe"]
     collection = db["metas"]
 
@@ -33,3 +33,4 @@ if authentication_status:
     form_metas.create_database_tab()
 
     st.session_state.client.close()
+    del st.session_state.client
