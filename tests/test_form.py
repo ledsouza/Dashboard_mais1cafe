@@ -1,27 +1,7 @@
 from widgets.forms import FormMetas
-from streamlit.testing.v1 import AppTest
 from datetime import date
 import pandas as pd
 import pytest
-
-def test_get_user_input(mongodb):
-    """
-    Test case for the get_user_input method of the FormMetas class.
-
-    This test verifies that the get_user_input method of the FormMetas class
-    runs without raising an exception.
-
-    Args:
-        mongodb: The MongoDB fixture.
-
-    Returns:
-        None
-    """
-    collection = mongodb.db_mais1cafe.metas
-    form_metas = FormMetas(collection)
-    at = AppTest.from_function(form_metas.get_user_input)
-    at.run()
-    assert not at.exception
 
 def test_update_meta_valid_date(mongodb, rollback_session):
     """

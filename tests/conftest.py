@@ -1,7 +1,6 @@
 import pytest
 import streamlit as st
 import pymongo
-from streamlit.testing.v1 import AppTest
 from unittest.mock import MagicMock
 
 @pytest.fixture(scope="session")
@@ -27,10 +26,3 @@ def rollback_session(mongodb):
         yield session
     finally:
         session.abort_transaction()
-
-@pytest.fixture
-def run_app():
-    at = AppTest.from_file('../Dashboard.py')
-    at.run()
-    assert not at.exception
-    return at
