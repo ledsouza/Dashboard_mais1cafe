@@ -31,6 +31,3 @@ if authentication_status:
     form_metas.create_update_form()
     form_metas.create_delete_form()
     form_metas.create_database_tab()
-
-    st.session_state.client.close()
-    del st.session_state.client

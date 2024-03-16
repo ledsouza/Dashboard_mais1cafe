@@ -39,6 +39,3 @@ if authentication_status:
     metas_distribution_plot(transformed_dataframe)
 
     descritive_statistics_table(transformed_dataframe)
-
-    st.session_state.client.close()
-    del st.session_state.client
