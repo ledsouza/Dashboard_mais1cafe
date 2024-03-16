@@ -12,7 +12,7 @@ def client_connection(uri) -> MongoClient:
     Raises:
         Exception: If there is an error connecting to MongoDB.
     """
-    client = MongoClient(uri, server_api=ServerApi('1'), maxIdleTimeMS=60000*10)
+    client = MongoClient(uri, server_api=ServerApi('1'))
 
     try:
         client.admin.command('ping')
