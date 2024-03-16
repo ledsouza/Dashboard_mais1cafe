@@ -3,7 +3,6 @@ from streamlit.testing.v1 import AppTest
 from datetime import date
 import pandas as pd
 import pytest
-from unittest.mock import MagicMock
 
 def test_get_user_input(mongodb):
     """
@@ -115,7 +114,7 @@ def test_insert_meta_valid_date(mongodb, rollback_session):
     insert_status = form_metas.insert_meta(session=rollback_session)
     assert insert_status
 
-def test_insert_meta_valid_date_with_exception(rollback_session):
+def test_insert_meta_valid_date_with_exception(mock_mongodb, rollback_session):
     """
     Test case for inserting meta with a valid date and an exception.
 
@@ -126,8 +125,6 @@ def test_insert_meta_valid_date_with_exception(rollback_session):
     Returns:
         None
     """
-    mock_mongodb = MagicMock()
-    mock_mongodb.insert_meta.side_effect = Exception("Erro ao inserir os dados")
     collection = mock_mongodb.db_mais1cafe.metas
 
     metas = {

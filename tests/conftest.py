@@ -2,6 +2,7 @@ import pytest
 import streamlit as st
 import pymongo
 from streamlit.testing.v1 import AppTest
+from unittest.mock import MagicMock
 
 @pytest.fixture(scope="session")
 def mongodb():
@@ -11,6 +12,12 @@ def mongodb():
     client = pymongo.MongoClient(uri)
     assert client.admin.command("ping")["ok"] != 0.0 # Check that the connection is okay.
     return client
+
+@pytest.fixture
+def mock_mongodb():
+    mock_mongodb = MagicMock()
+    mock_mongodb.insert_meta.side_effect = Exception("Mock Exception")
+    return mock_mongodb
 
 @pytest.fixture
 def rollback_session(mongodb):
