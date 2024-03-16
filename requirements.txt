@@ -4,7 +4,7 @@ plotly
 PyYAML
 requests
 streamlit
-streamlit-authenticator
+streamlit-authenticator==0.2.3
 toml
 pymongo
 pytest
