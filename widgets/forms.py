@@ -170,6 +170,7 @@ class FormMetas:
         """
         with self.insert_tab:
             with st.form(key="insert_data", clear_on_submit=True):
+                self.metas.clear()
                 self.get_user_input()
                 submit_button = st.form_submit_button(label="Inserir dados")
                 if submit_button:
@@ -204,6 +205,7 @@ class FormMetas:
                 st.error("É necessário selecionar pelo menos uma meta")
             else:
                 with st.form(key="update_data", clear_on_submit=True):
+                    self.metas.clear()
                     self.get_user_input(selected_metas)
                     submit_button = st.form_submit_button(label="Atualizar dados")
                     if submit_button:
