@@ -42,7 +42,7 @@ class FormMetas:
 
         if "Clientes" in selected_metas:
             self.metas["Clientes"] = st.number_input(
-                label="Clientes", max_value=self.metas_max_value, key="Clientes"
+                label="Clientes", max_value=self.metas_max_value
             )
 
         if "Produtos" in selected_metas:
