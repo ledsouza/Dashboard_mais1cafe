@@ -1,3 +1,4 @@
+from time import sleep
 import pandas as pd
 import streamlit as st
 from pymongo.collection import Collection
@@ -123,6 +124,7 @@ class FormMetas:
             insert_status = self.collection.insert_one(self.metas, session=session)
             if insert_status.inserted_id:
                 st.success(self.success_message)
+                sleep(0.5)
                 return True
             else:
                 raise Exception('Erro ao inserir os dados')
