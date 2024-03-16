@@ -14,6 +14,7 @@ class FormMetas:
         self.insert_tab, self.update_tab, self.delete_tab, self.database_tab = st.tabs(
             ["Inserir", "Atualizar", "Deletar", "Banco de Dados"]
         )
+        self.success_message = "YESSSSS"
 
     def get_user_input(
         self,
@@ -86,15 +87,27 @@ class FormMetas:
         if update_status.modified_count == 0:
             raise Exception('Os dados para a data selecionada não existem')
         else:
-            st.success("YESSSSS")
+            st.success(self.success_message)
             return True
         
     def insert_meta(self, session=None):
         """
         Inserts the goal in the collection.
 
+        This method inserts the goal data into the collection. It first checks if there is already a document with the same
+        "Data" value in the collection. If a document is found, an exception is raised. Otherwise, the goal data is inserted
+        into the collection using the `insert_one` method. If the insertion is successful, a success message is displayed
+        using `st.success` and the method returns True. If there is an error during the insertion, an exception is raised.
+
+        Args:
+            session (optional): The session to use for the insertion. Defaults to None.
+
         Returns:
-            bool: True if the insertion was successful, False otherwise.
+            bool: True if the insertion was successful.
+
+        Raises:
+            Exception: If there is already a document with the same "Data" value in the collection.
+            Exception: If there is an error during the insertion.
         """
         search_result = self.collection.find_one({"Data": self.metas["Data"]})
         if search_result is not None:
@@ -102,10 +115,33 @@ class FormMetas:
         else:
             insert_status = self.collection.insert_one(self.metas, session=session)
             if insert_status.inserted_id:
-                st.success("YESSSSS")
+                st.success(self.success_message)
                 return True
             else:
                 raise Exception('Erro ao inserir os dados')
+            
+    def delete_meta(self, date, session=None):
+        """
+        Deletes the goal in the collection.
+
+        Args:
+            date (str): The date of the goal to be deleted.
+            session (optional): The session to use for the deletion.
+
+        Returns:
+            bool: True if the deletion was successful, False otherwise.
+
+        Raises:
+            Exception: If the deletion was unsuccessful.
+
+        """
+        delete_status = self.collection.delete_one({"Data": date}, session=session)
+        if delete_status.deleted_count == 0:
+            raise Exception('Erro ao deletar os dados')
+        else:
+            st.success(self.success_message)
+            return True
+            
     
     def create_insert_form(self):
         """
@@ -175,7 +211,7 @@ class FormMetas:
                 if submit_button:
                     delete_status = self.collection.delete_one({"Data": date})
                     if delete_status.acknowledged:
-                        st.success("YESSSSS")
+                        st.success(self.success_message)
                     else:
                         st.error("Erro ao deletar os dados")
 
