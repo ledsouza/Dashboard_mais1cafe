@@ -345,7 +345,14 @@ def test_delete_meta_error(mock_mongodb, rollback_session):
         form_metas.delete_meta(date=test_date, session=rollback_session)
         assert str(excinfo.value) == 'Erro ao deletar os dados'
 
-def test_create_insert_form_widget(mongodb):
+def scrip_create_insert_form(mongodb):
+    from widgets.forms import FormMetas
+
+    collection = mongodb.db_mais1cafe.metas
+    form_metas = FormMetas(collection)
+    form_metas.create_insert_form()
+
+def test_create_insert_form(mongodb):
     """
     Test case for creating the insert form.
 
@@ -354,15 +361,23 @@ def test_create_insert_form_widget(mongodb):
 
     Returns:
         None
+    
     """
-    collection = mongodb.db_mais1cafe.metas
-
-    form_metas = FormMetas(collection)
-    at = AppTest.from_file('widgets/forms.py')
-    at.from_function(form_metas.create_insert_form)
+    at = AppTest.from_function(scrip_create_insert_form, args=(mongodb,))
     at.run()
 
     assert not at.exception
+
+def test_create_insert_form_invalid_value(mongodb):
+    at = AppTest.from_function(scrip_create_insert_form, args=(mongodb,))
+    at.run()
+
+    at.date_input[0].set_value(date(2020, 1, 1))
+    at.button[0].click()
+    at.run()
+
+    assert at.error
+
 
 def test_create_update_form_widget(mongodb):
     """

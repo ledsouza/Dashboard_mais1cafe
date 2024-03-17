@@ -201,7 +201,10 @@ class FormMetas:
                 self.get_user_input()
                 submit_button = st.form_submit_button(label="Inserir dados")
                 if submit_button:
-                    self.insert_meta()
+                    try:
+                        self.insert_meta()
+                    except (ValueError, DatabaseError) as e:
+                        st.error(e)
 
     def create_update_form(self):
         """
