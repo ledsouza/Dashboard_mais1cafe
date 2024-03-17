@@ -96,7 +96,7 @@ class FormMetas:
         update = {"$set": self.metas}
         update_status = self.collection.update_one(query, update, session=session)
         if update_status.modified_count == 0:
-            raise Exception("Os dados para a data selecionada não existem")
+            raise ValueError("Os dados para a data selecionada não existem")
         else:
             st.success(self.success_message)
             return True
@@ -214,7 +214,10 @@ class FormMetas:
                     self.get_user_input(selected_metas)
                     submit_button = st.form_submit_button(label="Atualizar dados")
                     if submit_button:
-                        self.update_meta()
+                        try:
+                            self.update_meta()
+                        except ValueError as e:
+                            st.error(e)
 
     def create_delete_form(self):
         """
