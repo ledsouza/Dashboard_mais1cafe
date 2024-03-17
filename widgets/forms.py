@@ -5,7 +5,7 @@ from pymongo.collection import Collection
 from pymongo import DESCENDING
 from data_processing.transformation import DataProcessing
 from data_processing.dataviz import StyledDataframe
-
+from exceptions.exceptions import DatabaseError
 
 class FormMetas:
     def __init__(self, collection: Collection) -> None:
@@ -89,7 +89,7 @@ class FormMetas:
             bool: True if the update was successful.
 
         Raises:
-            Exception: If the data for the selected date does not exist.
+            ValueError: If the data for the selected date does not exist.
 
         """
         query = {"Data": self.metas["Data"]}
@@ -103,10 +103,10 @@ class FormMetas:
 
     def insert_meta(self, session=None):
         """
-        Inserts the goal in the collection.
+        Inserts the meta in the collection.
 
-        This method inserts the goal data into the collection. It first checks if there is already a document with the same
-        "Data" value in the collection. If a document is found, an exception is raised. Otherwise, the goal data is inserted
+        This method inserts the meta data into the collection. It first checks if there is already a document with the same
+        "Data" value in the collection. If a document is found, an exception is raised. Otherwise, the meta data is inserted
         into the collection using the `insert_one` method. If the insertion is successful, a success message is displayed
         using `st.success` and the method returns True. If there is an error during the insertion, an exception is raised.
 
@@ -117,12 +117,12 @@ class FormMetas:
             bool: True if the insertion was successful.
 
         Raises:
-            Exception: If there is already a document with the same "Data" value in the collection.
-            Exception: If there is an error during the insertion.
+            ValueError: If there is already a document with the same "Data" value in the collection.
+            DatabaseError: If there is an error during the insertion.
         """
         search_result = self.collection.find_one({"Data": self.metas["Data"]})
         if search_result is not None:
-            raise Exception("Os dados para a data selecionada já existem")
+            raise ValueError("Os dados para a data selecionada já existem")
         else:
             insert_status = self.collection.insert_one(self.metas, session=session)
             if insert_status.inserted_id:
@@ -130,7 +130,7 @@ class FormMetas:
                 sleep(0.5)
                 return True
             else:
-                raise Exception("Erro ao inserir os dados")
+                raise DatabaseError("Erro ao inserir os dados")
 
     def delete_meta(self, date, session=None):
         """
@@ -144,20 +144,17 @@ class FormMetas:
             bool: True if the deletion was successful.
 
         Raises:
-            Exception: If the deletion was unsuccessful.
+            ValueError: If the data for the selected date does not exist.
+            DatabaseError: If there was an error while deleting the data.
 
         """
-        try:
-            search_result = self.collection.find_one({"Data": date})
-            if search_result is None:
-                raise Exception("Os dados para a data selecionada não existem")
-        except Exception as e:
-            st.error(e)
-            st.rerun()
+        search_result = self.collection.find_one({"Data": date})
+        if search_result is None:
+            raise ValueError("Os dados para a data selecionada não existem")
 
         delete_status = self.collection.delete_one({"Data": date}, session=session)
         if delete_status.deleted_count == 0:
-            raise Exception("Erro ao deletar os dados")
+            raise DatabaseError("Erro ao deletar os dados")
         else:
             st.success(self.success_message)
             return True
@@ -187,10 +184,12 @@ class FormMetas:
 
         This method creates a form using Streamlit's `st.form` function and adds user input fields.
         It also includes a submit button that, when clicked, updates the data in the database.
-        If the update is successful, a success message is displayed. Otherwise, an error message is shown.
+        If the update is successful, a success message is displayed. 
+        Otherwise, an error message is shown.
 
         Returns:
             None
+            
         """
         with self.update_tab:
             selected_metas = st.multiselect(
@@ -223,7 +222,8 @@ class FormMetas:
         """
         Creates a form for deleting data.
 
-        This method creates a Streamlit form that allows the user to input a date and delete the corresponding goal in that data from the collection.
+        This method creates a Streamlit form that allows the user to input a date 
+        and delete the corresponding goal in that data from the collection.
 
         Returns:
             None
@@ -236,6 +236,17 @@ class FormMetas:
                     self.delete_meta(date)
 
     def create_database_tab(self):
+        """
+        Creates a database tab and performs data processing
+        and styling operations on the retrieved data.
+
+        This method retrieves data from a collection, performs data processing operations
+        such as adding a week day and transforming the data to percentage, 
+        and applies styling to the transformed data.
+
+        Returns:
+            None
+        """
         with self.database_tab:
             metas_dataframe = pd.DataFrame(
                 self.collection.find({}, {"_id": 0}).sort("Data", DESCENDING)
