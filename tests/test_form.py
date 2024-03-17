@@ -85,6 +85,34 @@ def test_get_user_input_set_value(mongodb):
 
     assert not at.exception
 
+ # TODO: create this test   
+
+def script_get_user_input_max_value(mongodb):
+    from widgets.forms import FormMetas
+    from datetime import date
+    import pandas as pd
+
+    collection = mongodb.db_mais1cafe.metas
+    form_metas = FormMetas(collection)
+    form_metas.get_user_input()
+
+def test_get_user_input_max_value(mongodb):
+    at = AppTest.from_function(script_get_user_input_max_value, args=(mongodb,))
+    at.run()
+
+    at.date_input[0].set_value(date(2024, 1, 1))
+    at.number_input[0].set_value(10000.0)
+    at.number_input[1].set_value(10000.0)
+    at.number_input[2].set_value(10000.0)
+    at.number_input[3].set_value(10000.0)
+    at.number_input[4].set_value(10000.0)
+    at.number_input[5].set_value(10000.0)
+    at.selectbox[0].set_value("Ensolarado")
+
+    at.run()
+
+    assert not at.exception
+
 # TODO: Fix this test
 # def test_get_user_input_max_value(mongodb):
 #     at = AppTest.from_function(script_get_user_input, args=(mongodb,))
