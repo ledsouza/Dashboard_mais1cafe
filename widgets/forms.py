@@ -8,6 +8,28 @@ from data_processing.dataviz import StyledDataframe
 from exceptions.exceptions import DatabaseError
 
 class FormMetas:
+    """
+    Class representing a form for managing goals.
+
+    This class provides methods for retrieving user input, updating, inserting, and deleting goals in a collection.
+    It also includes methods for creating forms using Streamlit and performing data processing and styling operations.
+
+    Args:
+        collection (Collection): The MongoDB collection to work with.
+
+    Attributes:
+        collection (Collection): The MongoDB collection to work with.
+        metas (dict): A dictionary containing the user input for each goal.
+        metas_max_value (float): The maximum value allowed for the goals.
+        pa_max_value (float): The maximum value allowed for the PA goal.
+        insert_tab (Streamlit Tab): The insert tab in the Streamlit app.
+        update_tab (Streamlit Tab): The update tab in the Streamlit app.
+        delete_tab (Streamlit Tab): The delete tab in the Streamlit app.
+        database_tab (Streamlit Tab): The database tab in the Streamlit app.
+        success_message (str): The success message to display.
+
+    """
+
     def __init__(self, collection: Collection) -> None:
         self.collection = collection
         self.metas = {}
@@ -30,6 +52,7 @@ class FormMetas:
 
         Returns:
             dict: A dictionary containing the user input for each goal.
+
         """
         if selected_metas is None:
             selected_metas = [
@@ -119,6 +142,7 @@ class FormMetas:
         Raises:
             ValueError: If there is already a document with the same "Data" value in the collection.
             DatabaseError: If there is an error during the insertion.
+
         """
         search_result = self.collection.find_one({"Data": self.metas["Data"]})
         if search_result is not None:
@@ -169,6 +193,7 @@ class FormMetas:
 
         Returns:
             None
+
         """
         with self.insert_tab:
             with st.form(key="insert_data", clear_on_submit=True):
@@ -184,12 +209,12 @@ class FormMetas:
 
         This method creates a form using Streamlit's `st.form` function and adds user input fields.
         It also includes a submit button that, when clicked, updates the data in the database.
-        If the update is successful, a success message is displayed. 
+        If the update is successful, a success message is displayed.
         Otherwise, an error message is shown.
 
         Returns:
             None
-            
+
         """
         with self.update_tab:
             selected_metas = st.multiselect(
@@ -222,11 +247,12 @@ class FormMetas:
         """
         Creates a form for deleting data.
 
-        This method creates a Streamlit form that allows the user to input a date 
+        This method creates a Streamlit form that allows the user to input a date
         and delete the corresponding goal in that data from the collection.
 
         Returns:
             None
+
         """
         with self.delete_tab:
             with st.form(key="delete_data", clear_on_submit=True):
@@ -241,11 +267,12 @@ class FormMetas:
         and styling operations on the retrieved data.
 
         This method retrieves data from a collection, performs data processing operations
-        such as adding a week day and transforming the data to percentage, 
+        such as adding a week day and transforming the data to percentage,
         and applies styling to the transformed data.
 
         Returns:
             None
+
         """
         with self.database_tab:
             metas_dataframe = pd.DataFrame(
