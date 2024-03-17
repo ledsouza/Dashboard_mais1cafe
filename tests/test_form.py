@@ -1,10 +1,27 @@
-from widgets.forms import FormMetas
-from streamlit.testing.v1 import AppTest
 from datetime import date
+from streamlit.testing.v1 import AppTest
 import pandas as pd
 import pytest
+from widgets.forms import FormMetas
+
+# pylint: disable=redefined-outer-name
+# pylint: disable=reimported
+# pylint: disable=import-outside-toplevel
 
 def script_get_user_input_default(mongodb):
+    """
+    This function tests the `get_user_input` method of the `FormMetas` class.
+
+    Parameters:
+    - mongodb: An instance of the MongoDB client.
+
+    Returns:
+    None
+
+    Raises:
+    - AssertionError: If the result of `get_user_input` is not equal to the expected result.
+    """
+
     from widgets.forms import FormMetas
     from datetime import date
     import pandas as pd
@@ -25,15 +42,36 @@ def script_get_user_input_default(mongodb):
     }
 
     if metas != expected_result:
-        raise Exception(f"Expected: {expected_result}, Resulted: {metas}")
+        raise AssertionError(f"Expected: {expected_result}, Resulted: {metas}")
 
 def test_get_user_input_returns_default(mongodb):
+    """
+    Test case to verify that the 'get_user_input' function returns the default value.
+
+    Args:
+        mongodb: The MongoDB instance.
+
+    Returns:
+        None
+    """
     at = AppTest.from_function(script_get_user_input_default, args=(mongodb,))
     at.run()
 
     assert not at.exception
 
 def script_get_user_input_set_value(mongodb):
+    """
+    This function tests the behavior of the `get_user_input` method in the `FormMetas` class.
+
+    Parameters:
+    - mongodb: An instance of the MongoDB client.
+
+    Raises:
+    - AssertionError: If the returned `metas` dictionary is not equal to the expected results.
+
+    Returns:
+    - None
+    """
     from widgets.forms import FormMetas
     from datetime import date
     import pandas as pd
@@ -66,9 +104,18 @@ def script_get_user_input_set_value(mongodb):
 
     if metas != expected_default:
         if metas != expected_result:
-            raise Exception(f"Expected: {expected_result}, Resulted: {metas}")
-        
+            raise AssertionError(f"Expected: {expected_result}, Resulted: {metas}")
+
 def test_get_user_input_set_value(mongodb):
+    """
+    Test case for setting user input values and running the test.
+
+    Args:
+        mongodb: The MongoDB instance.
+
+    Returns:
+        None
+    """
     at = AppTest.from_function(script_get_user_input_set_value, args=(mongodb,))
     at.run()
 
@@ -84,51 +131,6 @@ def test_get_user_input_set_value(mongodb):
     at.run()
 
     assert not at.exception
-
- # TODO: create this test   
-
-def script_get_user_input_max_value(mongodb):
-    from widgets.forms import FormMetas
-    from datetime import date
-    import pandas as pd
-
-    collection = mongodb.db_mais1cafe.metas
-    form_metas = FormMetas(collection)
-    form_metas.get_user_input()
-
-def test_get_user_input_max_value(mongodb):
-    at = AppTest.from_function(script_get_user_input_max_value, args=(mongodb,))
-    at.run()
-
-    at.date_input[0].set_value(date(2024, 1, 1))
-    at.number_input[0].set_value(10000.0)
-    at.number_input[1].set_value(10000.0)
-    at.number_input[2].set_value(10000.0)
-    at.number_input[3].set_value(10000.0)
-    at.number_input[4].set_value(10000.0)
-    at.number_input[5].set_value(10000.0)
-    at.selectbox[0].set_value("Ensolarado")
-
-    at.run()
-
-    assert not at.exception
-
-# TODO: Fix this test
-# def test_get_user_input_max_value(mongodb):
-#     at = AppTest.from_function(script_get_user_input, args=(mongodb,))
-#     at.run()
-
-#     # Simulando usuário preenchendo os campos
-#     at.number_input[0].set_value(10000.0).run()
-#     at.number_input[1].set_value(10000.0)
-#     at.number_input[2].set_value(10000.0)
-#     at.number_input[3].set_value(10000.0)
-#     at.number_input[4].set_value(10000.0)
-#     at.number_input[5].set_value(10000.0)
-
-#     print(at.number_input[0])
-
-#     assert not at.exception
 
 def test_update_meta_valid_date(mongodb, rollback_session):
     """

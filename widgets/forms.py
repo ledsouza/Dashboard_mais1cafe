@@ -6,6 +6,7 @@ from pymongo import DESCENDING
 from data_processing.transformation import DataProcessing
 from data_processing.dataviz import StyledDataframe
 
+
 class FormMetas:
     def __init__(self, collection: Collection) -> None:
         self.collection = collection
@@ -19,15 +20,7 @@ class FormMetas:
 
     def get_user_input(
         self,
-        selected_metas=[
-            "Clientes",
-            "Produtos",
-            "PA",
-            "Ticket Médio",
-            "Faturamento",
-            "Cliente/Hora",
-            "Clima",
-        ],
+        selected_metas=None,
     ):
         """
         Retrieves user input for various goals.
@@ -38,6 +31,16 @@ class FormMetas:
         Returns:
             dict: A dictionary containing the user input for each goal.
         """
+        if selected_metas is None:
+            selected_metas = [
+                "Clientes",
+                "Produtos",
+                "PA",
+                "Ticket Médio",
+                "Faturamento",
+                "Cliente/Hora",
+                "Clima",
+            ]
 
         self.metas["Data"] = pd.to_datetime(st.date_input(label="Data"))
 
@@ -93,11 +96,11 @@ class FormMetas:
         update = {"$set": self.metas}
         update_status = self.collection.update_one(query, update, session=session)
         if update_status.modified_count == 0:
-            raise Exception('Os dados para a data selecionada não existem')
+            raise Exception("Os dados para a data selecionada não existem")
         else:
             st.success(self.success_message)
             return True
-        
+
     def insert_meta(self, session=None):
         """
         Inserts the goal in the collection.
@@ -119,7 +122,7 @@ class FormMetas:
         """
         search_result = self.collection.find_one({"Data": self.metas["Data"]})
         if search_result is not None:
-            raise Exception('Os dados para a data selecionada já existem')
+            raise Exception("Os dados para a data selecionada já existem")
         else:
             insert_status = self.collection.insert_one(self.metas, session=session)
             if insert_status.inserted_id:
@@ -127,8 +130,8 @@ class FormMetas:
                 sleep(0.5)
                 return True
             else:
-                raise Exception('Erro ao inserir os dados')
-            
+                raise Exception("Erro ao inserir os dados")
+
     def delete_meta(self, date, session=None):
         """
         Deletes the goal in the collection.
@@ -147,18 +150,18 @@ class FormMetas:
         try:
             search_result = self.collection.find_one({"Data": date})
             if search_result is None:
-                raise Exception('Os dados para a data selecionada não existem')
+                raise Exception("Os dados para a data selecionada não existem")
         except Exception as e:
             st.error(e)
             st.rerun()
-        
+
         delete_status = self.collection.delete_one({"Data": date}, session=session)
         if delete_status.deleted_count == 0:
-            raise Exception('Erro ao deletar os dados')
+            raise Exception("Erro ao deletar os dados")
         else:
             st.success(self.success_message)
             return True
-    
+
     def create_insert_form(self):
         """
         Creates a form for inserting data into the database.
@@ -212,7 +215,7 @@ class FormMetas:
                     submit_button = st.form_submit_button(label="Atualizar dados")
                     if submit_button:
                         self.update_meta()
-    
+
     def create_delete_form(self):
         """
         Creates a form for deleting data.
@@ -231,7 +234,9 @@ class FormMetas:
 
     def create_database_tab(self):
         with self.database_tab:
-            metas_dataframe = pd.DataFrame(self.collection.find({}, {"_id": 0}).sort("Data", DESCENDING))
+            metas_dataframe = pd.DataFrame(
+                self.collection.find({}, {"_id": 0}).sort("Data", DESCENDING)
+            )
             data_processing = DataProcessing(metas_dataframe)
             data_processing.add_week_day()
             transformed_metas = data_processing.transform_to_percentage()
