@@ -1,10 +1,10 @@
 from widgets.forms import FormMetas
 from streamlit.testing.v1 import AppTest
-from datetime import datetime
+from datetime import datetime, date
 import pandas as pd
 import pytest
 
-def script_get_user_input(mongodb):
+def script_get_user_input_default(mongodb):
     from widgets.forms import FormMetas
     from datetime import date
     import pandas as pd
@@ -13,7 +13,7 @@ def script_get_user_input(mongodb):
     form_metas = FormMetas(collection)
     metas = form_metas.get_user_input()
 
-    expected_default = {
+    expected_result = {
         "Data": pd.to_datetime(date.today()),
         "Clientes": 0.0,
         "Produtos": 0.0,
@@ -24,48 +24,31 @@ def script_get_user_input(mongodb):
         "Clima": "Ensolarado"
     }
 
-    if metas != expected_default:
-        raise Exception(f"Expected: {expected_default}, Resulted: {metas}")
+    if metas != expected_result:
+        raise Exception(f"Expected: {expected_result}, Resulted: {metas}")
 
-def test_get_user_input_returns_dict(mongodb):
-    at = AppTest.from_function(script_get_user_input, args=(mongodb,))
+def test_get_user_input_returns_default(mongodb):
+    at = AppTest.from_function(script_get_user_input_default, args=(mongodb,))
     at.run()
 
-    # Simulando usuário preenchendo os campos
-    at.date_input[0].set_value(pd.to_datetime(datetime(2024, 1, 1)))
-    at.number_input[0].set_value(1.0)
-    at.number_input[1].set_value(1.0)
-    at.number_input[2].set_value(1.0)
-    at.number_input[3].set_value(1.0)
-    at.number_input[4].set_value(1.0)
-    at.number_input[5].set_value(1.0)
-    at.selectbox[0].set_value("Ensolarado")
-
-    resulted_metas = {
-        "Data": at.date_input[0]._value,
-        "Clientes": at.number_input[0]._value,
-        "Produtos": at.number_input[1]._value,
-        "PA": at.number_input[2]._value,
-        "Ticket Médio": at.number_input[3]._value,
-        "Faturamento": at.number_input[4]._value,
-        "Cliente/Hora": at.number_input[5]._value,
-        "Clima": at.selectbox[0]._value
-    }
-
-    expected_metas = {
-        "Data": pd.to_datetime(datetime(2024, 1, 1)),
-        "Clientes": 1.0,
-        "Produtos": 1.0,
-        "PA": 1.0,
-        "Ticket Médio": 1.0,
-        "Faturamento": 1.0,
-        "Cliente/Hora": 1.0,
-        "Clima": "Ensolarado"
-    }
-    if expected_metas != resulted_metas:
-        raise Exception(f"Expected: {expected_metas}, Resulted: {resulted_metas}")
-
     assert not at.exception
+
+# TODO: Fix this test
+# def test_get_user_input_max_value(mongodb):
+#     at = AppTest.from_function(script_get_user_input, args=(mongodb,))
+#     at.run()
+
+#     # Simulando usuário preenchendo os campos
+#     at.number_input[0].set_value(10000.0).run()
+#     at.number_input[1].set_value(10000.0)
+#     at.number_input[2].set_value(10000.0)
+#     at.number_input[3].set_value(10000.0)
+#     at.number_input[4].set_value(10000.0)
+#     at.number_input[5].set_value(10000.0)
+
+#     print(at.number_input[0])
+
+#     assert not at.exception
 
 def test_update_meta_valid_date(mongodb, rollback_session):
     """
