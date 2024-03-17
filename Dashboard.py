@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 from widgets.user_authentication import create_authenticator
 from database.connection import client_connection
-from tests.data_processing.dataviz import metas_evolution_plot, metas_distribution_plot
-from tests.data_processing.data_processing import Filtering, DataProcessing, descritive_statistics_table
+from data_processing.dataviz import metas_evolution_plot, metas_distribution_plot
+from data_processing.transformation import Filtering, DataProcessing, descritive_statistics_table
 from pymongo import ASCENDING
 
 st.set_page_config(page_title="Dashboard de Metas", layout="wide")
