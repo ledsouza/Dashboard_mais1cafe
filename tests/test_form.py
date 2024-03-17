@@ -11,6 +11,8 @@ def test_get_user_input(mongodb):
     at.from_function(form_metas.get_user_input)
     at.run()
 
+    print('testing')
+
     assert not at.exception
 
 def test_update_meta_valid_date(mongodb, rollback_session):
