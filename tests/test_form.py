@@ -390,7 +390,7 @@ def test_create_insert_form_invalid_value(mongodb):
     at = AppTest.from_function(scrip_create_insert_form, args=(mongodb,))
     at.run()
 
-    at.date_input[0].set_value(date(2020, 1, 1))
+    at.date_input[0].set_value(date(2024, 1, 31))
     at.button[0].click()
     at.run()
 
