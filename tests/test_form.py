@@ -4,14 +4,12 @@ from datetime import date
 import pandas as pd
 import pytest
 
-def test_get_user_input(mongodb):    
+def test_get_user_input(mongodb):
     collection = mongodb.db_mais1cafe.metas
     form_metas = FormMetas(collection)
     at = AppTest.from_file('widgets/forms.py')
     at.from_function(form_metas.get_user_input)
     at.run()
-
-    print('testing')
 
     assert not at.exception
 
