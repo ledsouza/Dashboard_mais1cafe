@@ -1,6 +1,6 @@
 from widgets.forms import FormMetas
 from streamlit.testing.v1 import AppTest
-from datetime import datetime, date
+from datetime import date
 import pandas as pd
 import pytest
 
@@ -29,6 +29,58 @@ def script_get_user_input_default(mongodb):
 
 def test_get_user_input_returns_default(mongodb):
     at = AppTest.from_function(script_get_user_input_default, args=(mongodb,))
+    at.run()
+
+    assert not at.exception
+
+def script_get_user_input_set_value(mongodb):
+    from widgets.forms import FormMetas
+    from datetime import date
+    import pandas as pd
+
+    collection = mongodb.db_mais1cafe.metas
+    form_metas = FormMetas(collection)
+    metas = form_metas.get_user_input()
+
+    expected_default = {
+        "Data": pd.to_datetime(date.today()),
+        "Clientes": 0.0,
+        "Produtos": 0.0,
+        "PA": 0.0,
+        "Ticket Médio": 0.0,
+        "Faturamento": 0.0,
+        "Cliente/Hora": 0.0,
+        "Clima": "Ensolarado"
+    }
+
+    expected_result = {
+        "Data": pd.to_datetime(date(2024, 1, 1)),
+        "Clientes": 1.0,
+        "Produtos": 1.0,
+        "PA": 1.0,
+        "Ticket Médio": 1.0,
+        "Faturamento": 1.0,
+        "Cliente/Hora": 1.0,
+        "Clima": "Ensolarado"
+    }
+
+    if metas != expected_default:
+        if metas != expected_result:
+            raise Exception(f"Expected: {expected_result}, Resulted: {metas}")
+        
+def test_get_user_input_set_value(mongodb):
+    at = AppTest.from_function(script_get_user_input_set_value, args=(mongodb,))
+    at.run()
+
+    at.date_input[0].set_value(date(2024, 1, 1))
+    at.number_input[0].set_value(1.0)
+    at.number_input[1].set_value(1.0)
+    at.number_input[2].set_value(1.0)
+    at.number_input[3].set_value(1.0)
+    at.number_input[4].set_value(1.0)
+    at.number_input[5].set_value(1.0)
+    at.selectbox[0].set_value("Ensolarado")
+
     at.run()
 
     assert not at.exception
