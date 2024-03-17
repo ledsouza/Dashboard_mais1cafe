@@ -3,8 +3,8 @@ import pandas as pd
 import streamlit as st
 from pymongo.collection import Collection
 from pymongo import DESCENDING
-from tests.data_processing.data_processing import DataProcessing
-from tests.data_processing.dataviz import StyledDataframe
+from data_processing.transformation import DataProcessing
+from data_processing.dataviz import StyledDataframe
 
 class FormMetas:
     def __init__(self, collection: Collection) -> None:
