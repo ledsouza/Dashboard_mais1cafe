@@ -346,6 +346,15 @@ def test_delete_meta_error(mock_mongodb, rollback_session):
         assert str(excinfo.value) == 'Erro ao deletar os dados'
 
 def scrip_create_insert_form(mongodb):
+    """
+    Creates a form to insert data into the MongoDB collection.
+
+    Args:
+        mongodb: An instance of the MongoDB client.
+
+    Returns:
+        None
+    """
     from widgets.forms import FormMetas
 
     collection = mongodb.db_mais1cafe.metas
@@ -369,6 +378,15 @@ def test_create_insert_form(mongodb):
     assert not at.exception
 
 def test_create_insert_form_invalid_value(mongodb):
+    """
+    Test case for creating a form with invalid value.
+
+    Args:
+        mongodb: The MongoDB instance.
+
+    Returns:
+        None
+    """
     at = AppTest.from_function(scrip_create_insert_form, args=(mongodb,))
     at.run()
 
