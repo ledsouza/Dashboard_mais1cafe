@@ -1,8 +1,6 @@
 import streamlit as st
 from streamlit.testing.v1 import AppTest
 
-# TODO: Add tests for the pages.
-
 def test_home_no_interaction():
     """
     Test case to verify the behavior of the home page when there is no user interaction.
