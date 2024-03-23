@@ -1,7 +1,7 @@
 from time import sleep
 import pandas as pd
 import streamlit as st
-from pymongo.collection import Collection
+from pymongo.client_session import MongoClient
 from pymongo import DESCENDING
 from data_processing.transformation import DataProcessing
 from data_processing.dataviz import StyledDataframe
@@ -15,7 +15,7 @@ class FormMetas:
     It also includes methods for creating forms using Streamlit and performing data processing and styling operations.
 
     Args:
-        collection (Collection): The MongoDB collection to work with.
+        client: The MongoDB client to use for the connection.
 
     Attributes:
         collection (Collection): The MongoDB collection to work with.
@@ -30,8 +30,9 @@ class FormMetas:
 
     """
 
-    def __init__(self, collection: Collection) -> None:
-        self.collection = collection
+    def __init__(self, client: MongoClient, session=None) -> None:
+        self.collection = client["db_mais1cafe"]["metas"]
+        self.session = session
         self.metas = {}
         self.metas_max_value = 3.0
         self.pa_max_value = 4.0
@@ -101,12 +102,9 @@ class FormMetas:
 
         return self.metas
 
-    def update_meta(self, session=None):
+    def update_meta(self):
         """
         Updates the goal in the collection.
-
-        Args:
-            session (optional): The session to use for the update operation.
 
         Returns:
             bool: True if the update was successful.
@@ -117,14 +115,14 @@ class FormMetas:
         """
         query = {"Data": self.metas["Data"]}
         update = {"$set": self.metas}
-        update_status = self.collection.update_one(query, update, session=session)
+        update_status = self.collection.update_one(query, update, session=self.session)
         if update_status.modified_count == 0:
             raise ValueError("Os dados para a data selecionada não existem")
         else:
             st.success(self.success_message)
             return True
 
-    def insert_meta(self, session=None):
+    def insert_meta(self):
         """
         Inserts the meta in the collection.
 
@@ -132,9 +130,6 @@ class FormMetas:
         "Data" value in the collection. If a document is found, an exception is raised. Otherwise, the meta data is inserted
         into the collection using the `insert_one` method. If the insertion is successful, a success message is displayed
         using `st.success` and the method returns True. If there is an error during the insertion, an exception is raised.
-
-        Args:
-            session (optional): The session to use for the insertion. Defaults to None.
 
         Returns:
             bool: True if the insertion was successful.
@@ -148,7 +143,7 @@ class FormMetas:
         if search_result is not None:
             raise ValueError("Os dados para a data selecionada já existem")
         else:
-            insert_status = self.collection.insert_one(self.metas, session=session)
+            insert_status = self.collection.insert_one(self.metas, session=self.session)
             if insert_status.inserted_id:
                 st.success(self.success_message)
                 sleep(0.5)
@@ -156,13 +151,12 @@ class FormMetas:
             else:
                 raise DatabaseError("Erro ao inserir os dados")
 
-    def delete_meta(self, date, session=None):
+    def delete_meta(self, date):
         """
         Deletes the goal in the collection.
 
         Args:
             date (str): The date of the goal to be deleted.
-            session (optional): The session to use for the deletion.
 
         Returns:
             bool: True if the deletion was successful.
@@ -176,7 +170,7 @@ class FormMetas:
         if search_result is None:
             raise ValueError("Os dados para a data selecionada não existem")
 
-        delete_status = self.collection.delete_one({"Data": date}, session=session)
+        delete_status = self.collection.delete_one({"Data": date}, session=self.session)
         if delete_status.deleted_count == 0:
             raise DatabaseError("Erro ao deletar os dados")
         else:

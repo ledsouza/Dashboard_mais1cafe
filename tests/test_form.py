@@ -26,8 +26,7 @@ def script_get_user_input_default(mongodb):
     from datetime import date
     import pandas as pd
 
-    collection = mongodb.db_mais1cafe.metas
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb)
     metas = form_metas.get_user_input()
 
     expected_result = {
@@ -76,8 +75,7 @@ def script_get_user_input_set_value(mongodb):
     from datetime import date
     import pandas as pd
 
-    collection = mongodb.db_mais1cafe.metas
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb)
     metas = form_metas.get_user_input()
 
     expected_default = {
@@ -143,7 +141,6 @@ def test_update_meta_valid_date(mongodb, rollback_session):
     Returns:
         None
     """
-    collection = mongodb.db_mais1cafe.metas
 
     metas = {
         "Data": pd.to_datetime(date(2024, 1, 31)),
@@ -156,10 +153,10 @@ def test_update_meta_valid_date(mongodb, rollback_session):
         "Clima": "Ensolarado"
     }
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb, rollback_session)
     form_metas.metas = metas
 
-    update_status = form_metas.update_meta(session=rollback_session)
+    update_status = form_metas.update_meta()
     assert update_status
 
 def test_update_meta_invalid_date(mongodb, rollback_session):
@@ -173,7 +170,6 @@ def test_update_meta_invalid_date(mongodb, rollback_session):
     Returns:
         None
     """
-    collection = mongodb.db_mais1cafe.metas
 
     metas = {
         "Data": pd.to_datetime(date(2020, 1, 31)),
@@ -186,11 +182,11 @@ def test_update_meta_invalid_date(mongodb, rollback_session):
         "Clima": "Ensolarado"
     }
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb, rollback_session)
     form_metas.metas = metas
 
     with pytest.raises(Exception) as excinfo:
-        form_metas.update_meta(session=rollback_session)
+        form_metas.update_meta()
         assert str(excinfo.value) == 'Os dados para a data selecionada não existem'
 
 def test_insert_meta_valid_date(mongodb, rollback_session):
@@ -204,7 +200,6 @@ def test_insert_meta_valid_date(mongodb, rollback_session):
     Returns:
         None
     """
-    collection = mongodb.db_mais1cafe.metas
 
     metas = {
         "Data": pd.to_datetime(date(2020, 1, 31)),
@@ -217,10 +212,10 @@ def test_insert_meta_valid_date(mongodb, rollback_session):
         "Clima": "Ensolarado"
     }
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb, rollback_session)
     form_metas.metas = metas
 
-    insert_status = form_metas.insert_meta(session=rollback_session)
+    insert_status = form_metas.insert_meta()
     assert insert_status
 
 def test_insert_meta_valid_date_with_exception(mock_mongodb, rollback_session):
@@ -234,7 +229,6 @@ def test_insert_meta_valid_date_with_exception(mock_mongodb, rollback_session):
     Returns:
         None
     """
-    collection = mock_mongodb.db_mais1cafe.metas
 
     metas = {
         "Data": pd.to_datetime(date(2020, 1, 31)),
@@ -247,11 +241,11 @@ def test_insert_meta_valid_date_with_exception(mock_mongodb, rollback_session):
         "Clima": "Ensolarado"
     }
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mock_mongodb, rollback_session)
     form_metas.metas = metas
 
     with pytest.raises(Exception) as excinfo:
-        form_metas.insert_meta(session=rollback_session)
+        form_metas.insert_meta()
         assert str(excinfo.value) == 'Erro ao inserir os dados'
     
 
@@ -266,7 +260,6 @@ def test_insert_meta_invalid_date(mongodb, rollback_session):
     Returns:
         None
     """
-    collection = mongodb.db_mais1cafe.metas
 
     metas = {
         "Data": pd.to_datetime(date(2024, 1, 31)),
@@ -279,11 +272,11 @@ def test_insert_meta_invalid_date(mongodb, rollback_session):
         "Clima": "Ensolarado"
     }
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb, rollback_session)
     form_metas.metas = metas
 
     with pytest.raises(Exception) as excinfo:
-        form_metas.insert_meta(session=rollback_session)
+        form_metas.insert_meta()
         assert str(excinfo.value) == 'Os dados para a data selecionada já existem'
 
 def test_delete_meta_valid_date(mongodb, rollback_session):
@@ -297,12 +290,11 @@ def test_delete_meta_valid_date(mongodb, rollback_session):
     Returns:
         None
     """
-    collection = mongodb.db_mais1cafe.metas
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb, rollback_session)
     test_date = pd.to_datetime(date(2024, 1, 31))
 
-    delete_status = form_metas.delete_meta(date=test_date, session=rollback_session)
+    delete_status = form_metas.delete_meta(date=test_date)
     assert delete_status
 
 def test_delete_meta_invalid_date(mock_mongodb, rollback_session):
@@ -316,13 +308,12 @@ def test_delete_meta_invalid_date(mock_mongodb, rollback_session):
     Returns:
         None
     """
-    collection = mock_mongodb.db_mais1cafe.metas
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mock_mongodb, rollback_session)
     test_date = pd.to_datetime(date(2020, 1, 31))
 
     with pytest.raises(Exception) as excinfo:
-        form_metas.delete_meta(date=test_date, session=rollback_session)
+        form_metas.delete_meta(date=test_date)
         assert str(excinfo.value) == 'Os dados para a data selecionada não existem'
 
 def test_delete_meta_error(mock_mongodb, rollback_session):
@@ -336,58 +327,59 @@ def test_delete_meta_error(mock_mongodb, rollback_session):
     Returns:
         None
     """
-    collection = mock_mongodb.db_mais1cafe.metas
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mock_mongodb, rollback_session)
     test_date = pd.to_datetime(date(2024, 1, 31))
 
     with pytest.raises(Exception) as excinfo:
-        form_metas.delete_meta(date=test_date, session=rollback_session)
+        form_metas.delete_meta(date=test_date)
         assert str(excinfo.value) == 'Erro ao deletar os dados'
 
-def scrip_create_insert_form(mongodb):
+def scrip_create_insert_form(mongodb, rollback_session):
     """
     Creates a form to insert data into the MongoDB collection.
 
     Args:
         mongodb: An instance of the MongoDB client.
+        rollback_session: The rollback session.
 
     Returns:
         None
     """
     from widgets.forms import FormMetas
 
-    collection = mongodb.db_mais1cafe.metas
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb, rollback_session)
     form_metas.create_insert_form()
 
-def test_create_insert_form(mongodb):
+def test_create_insert_form(mongodb, rollback_session):
     """
     Test case for creating the insert form.
 
     Args:
         mongodb: The MongoDB instance.
+        rollback_session: The rollback session.
 
     Returns:
         None
     
     """
-    at = AppTest.from_function(scrip_create_insert_form, args=(mongodb,))
+    at = AppTest.from_function(scrip_create_insert_form, args=(mongodb, rollback_session))
     at.run()
 
     assert not at.exception
 
-def test_create_insert_form_invalid_value(mongodb):
+def test_create_insert_form_invalid_value(mongodb, rollback_session):
     """
     Test case for creating a form with invalid value.
 
     Args:
         mongodb: The MongoDB instance.
+        rollback_session: The rollback session.
 
     Returns:
         None
     """
-    at = AppTest.from_function(scrip_create_insert_form, args=(mongodb,))
+    at = AppTest.from_function(scrip_create_insert_form, args=(mongodb,rollback_session))
     at.run()
 
     at.date_input[0].set_value(date(2024, 1, 31))
@@ -397,57 +389,57 @@ def test_create_insert_form_invalid_value(mongodb):
     assert at.error
 
 
-def test_create_update_form_widget(mongodb):
+def test_create_update_form_widget(mongodb, rollback_session):
     """
     Test case for creating the update form.
 
     Args:
         mongodb: The MongoDB instance.
+        rollback_session: The rollback session.
 
     Returns:
         None
     """
-    collection = mongodb.db_mais1cafe.metas
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb, rollback_session)
     at = AppTest.from_file('widgets/forms.py')
     at.from_function(form_metas.create_update_form)
     at.run()
 
     assert not at.exception
 
-def test_create_delete_form_widget(mongodb):
+def test_create_delete_form_widget(mongodb, rollback_session):
     """
     Test case for creating the delete form.
 
     Args:
         mongodb: The MongoDB instance.
+        rollback_session: The rollback session.
 
     Returns:
         None
     """
-    collection = mongodb.db_mais1cafe.metas
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb, rollback_session)
     at = AppTest.from_file('widgets/forms.py')
     at.from_function(form_metas.create_delete_form)
     at.run()
 
     assert not at.exception
 
-def test_create_database_tab_widget(mongodb):
+def test_create_database_tab_widget(mongodb, rollback_session):
     """
     Test case for creating the database tab.
 
     Args:
         mongodb: The MongoDB instance.
+        rollback_session: The rollback session.
 
     Returns:
         None
     """
-    collection = mongodb.db_mais1cafe.metas
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(mongodb, rollback_session)
     at = AppTest.from_file('widgets/forms.py')
     at.from_function(form_metas.create_database_tab)
     at.run()

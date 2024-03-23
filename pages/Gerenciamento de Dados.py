@@ -21,11 +21,8 @@ if authentication_status:
         mongodb_password = st.secrets['db_credential']['password']
         uri = f"mongodb+srv://ledsouza:{mongodb_password}@cluster-mais1cafe.editxaq.mongodb.net/?retryWrites=true&w=majority"
         st.session_state.client = client_connection(uri)
-    
-    db = st.session_state.client["db_mais1cafe"]
-    collection = db["metas"]
 
-    form_metas = FormMetas(collection)
+    form_metas = FormMetas(st.session_state.client)
 
     form_metas.create_insert_form()
     form_metas.create_update_form()
