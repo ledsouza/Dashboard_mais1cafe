@@ -13,11 +13,10 @@ def authenticated_menu():
     Returns:
         None
     """
-    st.sidebar.page_link("Home.py", label="Home")
     if st.session_state.authentication_status is True:
         st.sidebar.page_link("pages/dashboard.py", label="Dashboard")
-        st.sidebar.page_link("pages/data_management.py", label="Gerência de Dados")
-        st.session_state['user_management'].logout_widget()
+        st.sidebar.page_link("pages/metas_database.py", label="Banco de Dados das Metas")
+        st.session_state.authenticator.logout()
 
 
 def unauthenticated_menu():

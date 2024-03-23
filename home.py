@@ -3,8 +3,10 @@ from widgets.user_authentication import UserAuthentication
 
 st.set_page_config(layout="centered")
 
-user_authentication = UserAuthentication()
-user_authentication.login()
+if 'authenticator' not in st.session_state:
+    st.session_state.authenticator = UserAuthentication()
+
+st.session_state.authenticator.login()
 
 if st.session_state.authentication_status is None:
     st.warning("Por favor, insira o usuário e a senha")
