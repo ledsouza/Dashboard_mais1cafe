@@ -8,7 +8,7 @@ from widgets.forms import FormMetas
 # pylint: disable=reimported
 # pylint: disable=import-outside-toplevel
 
-def script_get_user_input_default(mongodb):
+def script_get_user_input_default(mongodb, rollback_session):
     """
     This function tests the `get_user_input` method of the `FormMetas` class.
 
@@ -26,7 +26,7 @@ def script_get_user_input_default(mongodb):
     from datetime import date
     import pandas as pd
 
-    form_metas = FormMetas(mongodb)
+    form_metas = FormMetas(mongodb, rollback_session)
     metas = form_metas.get_user_input()
 
     expected_result = {
@@ -43,7 +43,7 @@ def script_get_user_input_default(mongodb):
     if metas != expected_result:
         raise AssertionError(f"Expected: {expected_result}, Resulted: {metas}")
 
-def test_get_user_input_returns_default(mongodb):
+def test_get_user_input_returns_default(mongodb, rollback_session):
     """
     Test case to verify that the 'get_user_input' function returns the default value.
 
@@ -53,12 +53,12 @@ def test_get_user_input_returns_default(mongodb):
     Returns:
         None
     """
-    at = AppTest.from_function(script_get_user_input_default, args=(mongodb,))
+    at = AppTest.from_function(script_get_user_input_default, args=(mongodb,rollback_session))
     at.run()
 
     assert not at.exception
 
-def script_get_user_input_set_value(mongodb):
+def script_get_user_input_set_value(mongodb, rollback_session):
     """
     This function tests the behavior of the `get_user_input` method in the `FormMetas` class.
 
@@ -75,7 +75,7 @@ def script_get_user_input_set_value(mongodb):
     from datetime import date
     import pandas as pd
 
-    form_metas = FormMetas(mongodb)
+    form_metas = FormMetas(mongodb, rollback_session)
     metas = form_metas.get_user_input()
 
     expected_default = {
@@ -104,7 +104,7 @@ def script_get_user_input_set_value(mongodb):
         if metas != expected_result:
             raise AssertionError(f"Expected: {expected_result}, Resulted: {metas}")
 
-def test_get_user_input_set_value(mongodb):
+def test_get_user_input_set_value(mongodb, rollback_session):
     """
     Test case for setting user input values and running the test.
 
@@ -114,7 +114,7 @@ def test_get_user_input_set_value(mongodb):
     Returns:
         None
     """
-    at = AppTest.from_function(script_get_user_input_set_value, args=(mongodb,))
+    at = AppTest.from_function(script_get_user_input_set_value, args=(mongodb,rollback_session))
     at.run()
 
     at.date_input[0].set_value(date(2024, 1, 1))
