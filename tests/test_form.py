@@ -247,7 +247,6 @@ def test_insert_meta_valid_date_with_exception(mock_mongodb, rollback_session):
     with pytest.raises(Exception) as excinfo:
         form_metas.insert_meta()
         assert str(excinfo.value) == 'Erro ao inserir os dados'
-    
 
 def test_insert_meta_invalid_date(mongodb, rollback_session):
     """
