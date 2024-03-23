@@ -1,6 +1,6 @@
 import streamlit as st
 from widgets.forms import FormMetas
-from widgets.user_authentication import create_authenticator
+from widgets.user_authentication import UserAuthentication
 from database.connection import client_connection
 
 st.set_page_config(layout="wide")
