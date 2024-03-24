@@ -5,7 +5,7 @@ def authenticated_menu():
     Show a navigation menu for authenticated users.
 
     This function displays a navigation menu in the sidebar for authenticated users. It includes links to the home page,
-    dashboard, and data management pages. It also includes a logout widget.
+    dashboard, and meta database pages. It also includes a logout widget.
 
     Parameters:
         None
