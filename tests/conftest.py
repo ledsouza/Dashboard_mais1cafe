@@ -36,6 +36,7 @@ def mock_mongodb():
     mock_client.side_effect = Exception("Mock Exception")
     return mock_client
 
+# pylint: disable=redefined-outer-name
 @pytest.fixture
 def rollback_session(mongodb):
     """
@@ -54,3 +55,17 @@ def rollback_session(mongodb):
         yield session
     finally:
         session.abort_transaction()
+
+@pytest.fixture
+def login_credentials():
+    """
+    Fixture for setting up the login credentials.
+
+    This fixture sets up the login credentials for the test cases.
+
+    Returns:
+        dict: A dictionary containing the user and password.
+    """
+    user = st.secrets['login_credential']['user']
+    password = st.secrets['login_credential']['password']
+    return {"user": user, "password": password}
