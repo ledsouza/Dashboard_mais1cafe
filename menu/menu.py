@@ -42,7 +42,7 @@ def menu():
     If the user is not logged in or the authentication status is False or None, the unauthenticated menu will be shown.
     Otherwise, the authenticated menu will be shown.
     """
-    if "authentication_status" not in st.session_state or st.session_state.authentication_status is False or st.session_state.authentication_status is None:
+    if not st.session_state.get('authentication_status', False)
         unauthenticated_menu()
         return
     authenticated_menu()
@@ -52,6 +52,6 @@ def menu_with_redirect():
     """
     Redirect users to the main page if not logged in, otherwise continue to render the navigation menu.
     """
-    if "authentication_status" not in st.session_state or st.session_state.authentication_status is False or st.session_state.authentication_status is None:
+    if not st.session_state.get('authentication_status', False)
         st.switch_page("home.py")
     menu()
